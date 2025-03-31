@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Test Portal (Admin & User)</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" />
+    <style>
+        /* --- Minimal Base Styles --- */
+        body { font-family: sans-serif; margin: 0; background-color: #f0f0f0; }
+        .view-container { display: none; /* Hide all views by default */ flex-direction: column; padding: 20px; background-color: #fff; min-height: 100vh; box-sizing: border-box; }
+        .view-container.active-view { display: flex; /* Show only the active view */ }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
+        .user-info span { margin-right: 15px; }
+        button { padding: 8px 15px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background-color: #e7e7e7; }
+        button:hover:not(:disabled) { background-color: #ddd; }
+        button:disabled { cursor: not-allowed; opacity: 0.6; }
+        #loading-overlay { /* Basic Loading Styles */ position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.8); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        /* Add styles for Admin Test List Items, Public Toggle, User Test List Items */
+        .admin-test-item, .user-test-item { border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;}
+        .test-title { font-weight: bold; }
+        .test-details { font-size: 0.9em; color: #555; }
+
+        /* Basic Toggle Switch CSS */
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; margin: 0 10px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
+        input:checked + .slider { background-color: #4CAF50; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .slider.round { border-radius: 24px; }
+        .slider.round:before { border-radius: 50%; }
+        .public-status { font-size: 0.9em; color: #777; }
+
+        /* Mock Test Enhancements */
+        .test-body { display: flex; gap: 20px; flex-grow: 1; }
+        .question-area { flex-grow: 1; }
+        .palette-area { flex-shrink: 0; width: 200px; border-left: 1px solid #eee; padding-left: 15px; }
+        #question-palette { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        #question-palette button { width: 30px; height: 30px; text-align: center; padding: 5px; line-height: 18px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; }
+        #question-palette button.answered { background-color: #d4edda; }
+        #question-palette button.marked { border: 2px solid #ffc107; }
+        #question-palette button.current { background-color: #007bff; color: white; }
+        .palette-legend { font-size: 0.8em; color: #555; }
+        .test-actions { margin-top: 15px; }
+        .test-actions button { margin-right: 10px; }
+        .test-options label { display: block; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 4px; cursor: pointer; }
+        .test-options label:hover { background-color: #f9f9f9; }
+        .test-options input[type="radio"] { margin-right: 8px; }
+
+        /* Review Styles */
+        /* Add styles from your previous code or new ones */
+        .review-item { border: 1px solid #eee; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .user-answer-incorrect { color: red; text-decoration: line-through;}
+        .correct-answer { color: green; font-weight: bold; }
+        .user-answer-skipped { color: orange; font-style: italic; }
+    </style>
+
+    <script> window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }, svg: { fontCache: 'global' }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script type="module">
+        try {
+            const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = await import("https://esm.run/@google/generative-ai");
+            window.GoogleGenerativeAI = GoogleGenerativeAI; window.HarmCategory = HarmCategory; window.HarmBlockThreshold = HarmBlockThreshold;
+            console.log("GoogleGenerativeAI SDK loaded successfully via module.");
+            window.dispatchEvent(new Event('google-ai-sdk-loaded'));
+        } catch (error) { console.error("Failed to load GoogleGenerativeAI SDK:", error); window.googleAiSdkLoadError = error; }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+</head>
+<body>
+
+    <div id="loading-overlay" style="display: none;">
+        <p id="loading-message">Loading...</p>
+    </div>
+
+    <div id="app-root">
+
+        <div id="login-view" class="view-container active-view"> <h2>Welcome to the Unified Test Portal</h2>
+            <p>Please log in with your Google Account to continue.</p>
+            <button id="login-google-btn">Login with Google</button>
+        </div>
+
+        <div id="admin-dashboard-view" class="view-container">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <div class="user-info">
+                    <span id="admin-user-email">email@example.com</span>
+                    <button id="admin-logout-btn">Logout</button>
+                </div>
+            </div>
+            <h3>Manage Your Tests</h3>
+            <div id="admin-test-list">
+                <p>Loading your tests...</p>
+            </div>
+        </div>
+
+        <div id="user-dashboard-view" class="view-container">
+             <div class="dashboard-header">
+                <h2>Available Tests</h2>
+                 <div class="user-info">
+                    <span id="user-user-email">email@example.com</span>
+                    <button id="user-logout-btn">Logout</button>
+                </div>
+            </div>
+            <div id="user-test-list">
+                <p>Loading available tests...</p>
+            </div>
+        </div>
+
+        <div id="mock-test-view" class="view-container">
+            <div class="test-header">
+                <h2 id="test-title">Mock Test</h2>
+                <div class="test-info">
+                    <span id="question-counter">Q: 1 / N</span>
+                    <span id="test-timer">Time: 00:00</span>
+                </div>
+            </div>
+
+            <div class="test-body">
+                <div class="question-area">
+                    <div class="test-question-container">
+                        <div class="test-question-number" id="test-question-number">Question 1</div>
+                        <div class="test-question" id="test-question">Loading question...</div>
+                        <div class="test-options" id="test-options">
+                            </div>
+                    </div>
+                     <div class="test-actions">
+                         <button id="mark-review-btn">Mark for Review</button>
+                         <button id="clear-response-btn">Clear Response</button>
+                     </div>
+                </div>
+
+                <div class="palette-area">
+                    <h4>Question Palette</h4>
+                    <div id="question-palette">
+                        </div>
+                    <div class="palette-legend">
+                        <p><span style="display:inline-block; width:10px; height:10px; background-color:#d4edda; margin-right:5px;"></span> Answered</p>
+                        <p><span style="display:inline-block; width:10px; height:10px; border: 2px solid #ffc107; margin-right:5px;"></span> Marked for Review</p>
+                        <p><span style="display:inline-block; width:10px; height:10px; background-color:#fff; border: 1px solid #ccc; margin-right:5px;"></span> Not Answered</p>
+                        <p><span style="display:inline-block; width:10px; height:10px; background-color:#007bff; margin-right:5px;"></span> Current</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-navigation">
+                <button id="prev-question-btn" disabled>Previous</button>
+                <button id="next-question-btn">Next</button>
+                <button id="submit-test-btn" style="background-color: #dc3545; color: white;">Submit Test</button>
+            </div>
+        </div>
+
+        <div id="review-view" class="view-container">
+             <div class="review-header">
+                 <h2 id="review-title">Test Review</h2>
+                 <div>
+                     <div class="review-summary" id="review-summary">Loading summary...</div>
+                     </div>
+                 <div class="review-filters" id="review-filters" style="display: none; margin-top: 10px;">
+                     Filter:
+                     <button data-filter="all" class="active-filter">All</button>
+                     <button data-filter="incorrect">Incorrect</button>
+                     <button data-filter="skipped">Skipped</button>
+                 </div>
+             </div>
+             <div class="review-content" id="review-content">
+                 <p>Loading review...</p>
+             </div>
+             <div class="review-footer" style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 15px; text-align: center;">
+                 <button id="exit-review-btn">Back to Dashboard</button>
+             </div>
+         </div>
+
+    </div> <script>
+        // --- Firebase Config ---
+        const firebaseConfig = {
+             apiKey: "YOUR_API_KEY", // Replace with your actual config
+             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+             projectId: "YOUR_PROJECT_ID",
+             storageBucket: "YOUR_PROJECT_ID.appspot.com",
+             messagingSenderId: "YOUR_SENDER_ID",
+             appId: "YOUR_APP_ID",
+             measurementId: "YOUR_MEASUREMENT_ID" // Optional
+        };
+
+        // --- Initialize Firebase ---
+        firebase.initializeApp(firebaseConfig);
+        const fbAuth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- DOM Elements ---
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        const appRoot = document.getElementById('app-root');
+        const loginView = document.getElementById('login-view');
+        const adminDashboardView = document.getElementById('admin-dashboard-view');
+        const userDashboardView = document.getElementById('user-dashboard-view');
+        const mockTestView = document.getElementById('mock-test-view');
+        const reviewView = document.getElementById('review-view');
+        // ... (Get references to all other buttons, lists, inputs, etc. needed)
+        const loginBtn = document.getElementById('login-google-btn');
+        const adminLogoutBtn = document.getElementById('admin-logout-btn');
+        const userLogoutBtn = document.getElementById('user-logout-btn');
+        const adminUserEmail = document.getElementById('admin-user-email');
+        const userUserEmail = document.getElementById('user-user-email');
+        const adminTestListContainer = document.getElementById('admin-test-list');
+        const userTestListContainer = document.getElementById('user-test-list');
+        // Test View Elements
+        const testTitle = document.getElementById('test-title');
+        const questionCounter = document.getElementById('question-counter');
+        const testTimer = document.getElementById('test-timer');
+        const testQuestionNumber = document.getElementById('test-question-number');
+        const testQuestion = document.getElementById('test-question');
+        const testOptionsContainer = document.getElementById('test-options');
+        const questionPalette = document.getElementById('question-palette');
+        const markReviewBtn = document.getElementById('mark-review-btn');
+        const clearResponseBtn = document.getElementById('clear-response-btn');
+        const prevQuestionBtn = document.getElementById('prev-question-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const submitTestBtn = document.getElementById('submit-test-btn');
+        // Review View Elements
+        const reviewTitle = document.getElementById('review-title');
+        const reviewSummary = document.getElementById('review-summary');
+        const reviewFilters = document.getElementById('review-filters');
+        const reviewContent = document.getElementById('review-content');
+        const exitReviewBtn = document.getElementById('exit-review-btn');
+
+
+        // --- State Variables ---
+        let currentUser = null;
+        let isAdmin = false;
+        let currentView = 'login'; // Tracks the currently active view ID
+        let isAISdkReady = false;
+        let genAI = null;
+        let HarmCategory = null;
+        let HarmBlockThreshold = null;
+        let API_KEY = ''; // Load this securely or prompt user
+
+        // Test State
+        let currentTestMCQs = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = []; // Can be array of indexes or objects { answerIndex: null/0/1.., marked: false }
+        let testStartTime = null;
+        let testTimerInterval = null;
+        let reviewResultsCache = null; // To hold results after test submission
+
+        // --- Initialization ---
+        initializeApp();
+
+
+        // --- Core Functions ---
+        function initializeApp() {
+            setLoading(true, "Initializing...");
+            loadApiKeyMaybe(); // Function to get API Key
+
+            // Listen for AI SDK load event
+            window.addEventListener('google-ai-sdk-loaded', () => {
+                 console.log("Caught 'google-ai-sdk-loaded' event.");
+                 isAISdkReady = true;
+                 HarmCategory = window.HarmCategory;
+                 HarmBlockThreshold = window.HarmBlockThreshold;
+                 if (API_KEY) initializeGenAIInstance(); // Init AI if key already loaded
+                 checkInitialState(); // Re-check state after SDK loads
+            });
+             if (window.googleAiSdkLoadError) { // Check if SDK failed to load
+                  console.error("AI SDK failed to load on initial check.");
+                  // Potentially show error message permanently
+             }
+
+            fbAuth.onAuthStateChanged(handleAuthStateChange);
+        }
+
+        function loadApiKeyMaybe() {
+             // Implement logic to load API_KEY (e.g., from localStorage, prompt)
+             // For demo, using a placeholder:
+             API_KEY = localStorage.getItem('geminiApiKey_insecureDemo') || ""; // Replace with secure method!
+             if (!API_KEY) {
+                 console.warn("API Key not found. AI features may be limited.");
+                 // Maybe prompt user or show instructions
+             }
+             if (API_KEY && isAISdkReady) initializeGenAIInstance();
+
+        }
+
+         function initializeGenAIInstance() {
+             if (!API_KEY || !isAISdkReady || !window.GoogleGenerativeAI || !HarmCategory || !HarmBlockThreshold) {
+                 console.warn("Cannot initialize genAI. Missing API Key, SDK, or Harm types.");
+                 genAI = null;
+                 return false;
+             }
+             try {
+                genAI = new window.GoogleGenerativeAI(API_KEY);
+                console.log("genAI instance created successfully.");
+                return true;
+             } catch(e) {
+                console.error("Error initializing GoogleGenerativeAI:", e);
+                genAI = null;
+                // Display persistent error to user
+                return false;
+             }
+         }
+
+
+        function handleAuthStateChange(user) {
+            setLoading(true, user ? "Loading user data..." : "Logging out...");
+            currentUser = user;
+
+            if (user) {
+                console.log("User logged in:", user.uid, user.email);
+                // Check if user is admin
+                checkAdminStatus(user.uid).then(isAdminUser => {
+                    isAdmin = isAdminUser;
+                    console.log("Is Admin:", isAdmin);
+                    updateUserInfoUI(user); // Update email in header etc.
+                    if (isAdmin) {
+                        showView('admin-dashboard-view');
+                        loadAdminTests(user.uid);
+                    } else {
+                        showView('user-dashboard-view');
+                        loadPublicTests();
+                    }
+                    setLoading(false);
+                });
+            } else {
+                console.log("User logged out.");
+                isAdmin = false;
+                currentTestMCQs = []; // Clear any ongoing test state
+                if (testTimerInterval) clearInterval(testTimerInterval);
+                showView('login-view');
+                setLoading(false);
+            }
+        }
+
+        async function checkAdminStatus(userId) {
+            if (!userId) return false;
+            try {
+                // Check the 'admins' collection (replace with your actual check)
+                const adminDocRef = db.collection('admins').doc(userId);
+                const docSnap = await adminDocRef.get();
+                return docSnap.exists; // User is admin if their userId doc exists in 'admins'
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                return false; // Default to non-admin on error
+            }
+        }
+
+        function updateUserInfoUI(user) {
+            if (!user) return;
+             const email = user.email || "User";
+             if(adminUserEmail) adminUserEmail.textContent = email;
+             if(userUserEmail) userUserEmail.textContent = email;
+        }
+
+
+        function showView(viewId) {
+            console.log("Switching view to:", viewId);
+            // Hide all view containers
+            document.querySelectorAll('.view-container').forEach(view => {
+                view.classList.remove('active-view');
+            });
+            // Show the target view
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active-view');
+                currentView = viewId;
+            } else {
+                console.error("View not found:", viewId);
+                // Fallback to login view maybe?
+                 document.getElementById('login-view')?.classList.add('active-view');
+                 currentView = 'login';
+            }
+        }
+
+        function setLoading(isLoading, message = "Loading...") {
+            if (loadingOverlay) {
+                loadingMessage.textContent = message;
+                loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+            }
+             // Disable interactive elements when loading
+             document.querySelectorAll('button, input, select, textarea').forEach(el => {
+                 if(isLoading) el.disabled = true;
+                 // Re-enable based on specific logic when *not* loading (handle in respective functions)
+             });
+             // Re-enable auth buttons specifically if needed
+             if(!isLoading) {
+                loginBtn.disabled = false;
+                if(adminLogoutBtn) adminLogoutBtn.disabled = !currentUser;
+                if(userLogoutBtn) userLogoutBtn.disabled = !currentUser;
+             }
+        }
+
+        // Placeholder: Check initial state on load / after SDK ready
+        function checkInitialState() {
+             // If user is already known from onAuthStateChanged, show correct view
+             if (currentUser) {
+                 if (isAdmin) showView('admin-dashboard-view');
+                 else showView('user-dashboard-view');
+                 setLoading(false);
+             } else {
+                 showView('login-view');
+                 setLoading(false);
+             }
+        }
+
+
+        // --- Authentication Functions ---
+        async function signInWithGoogle() {
+             const provider = new firebase.auth.GoogleAuthProvider();
+             try { setLoading(true, "Logging in..."); await fbAuth.signInWithPopup(provider); }
+             catch (error) { console.error("Google Sign-In Error:", error); alert(`Login failed: ${error.message}`); setLoading(false); }
+        }
+
+        async function signOut() {
+             try { setLoading(true, "Logging out..."); await fbAuth.signOut(); }
+             catch (error) { console.error("Sign Out Error:", error); alert(`Logout failed: ${error.message}`); setLoading(false); }
+        }
+
+        // --- Admin Dashboard Functions ---
+        async function loadAdminTests(adminUserId) {
+            if (!adminUserId) return;
+            adminTestListContainer.innerHTML = '<p>Loading your tests...</p>';
+            try {
+                const snapshot = await db.collection('testReviews')
+                                        .where('userId', '==', adminUserId)
+                                        .orderBy('savedAt', 'desc')
+                                        .get();
+
+                if (snapshot.empty) {
+                    adminTestListContainer.innerHTML = '<p>You haven\'t saved any tests yet.</p>';
+                    return;
+                }
+
+                adminTestListContainer.innerHTML = ''; // Clear loading message
+                snapshot.forEach(doc => {
+                    const testData = { id: doc.id, ...doc.data() };
+                    const testItem = createAdminTestListItem(testData);
+                    adminTestListContainer.appendChild(testItem);
+                });
+            } catch (error) {
+                console.error("Error loading admin tests:", error);
+                adminTestListContainer.innerHTML = '<p style="color: red;">Error loading your tests.</p>';
+            }
+        }
+
+        function createAdminTestListItem(testData) {
+            const item = document.createElement('div');
+            item.classList.add('admin-test-item');
+            item.dataset.testid = testData.id;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.classList.add('test-title');
+            titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+
+            const detailsSpan = document.createElement('span');
+            detailsSpan.classList.add('test-details');
+            const dateStr = testData.savedAt?.toDate ? testData.savedAt.toDate().toLocaleDateString() : 'N/A';
+            detailsSpan.textContent = `Saved: ${dateStr} | Score: ${testData.summary?.score || 'N/A'}`;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.classList.add('admin-actions');
+
+            // Public Toggle
+            const toggleLabel = document.createElement('label');
+            toggleLabel.classList.add('switch');
+            const toggleInput = document.createElement('input');
+            toggleInput.type = 'checkbox';
+            toggleInput.classList.add('public-toggle-switch');
+            toggleInput.checked = testData.isPublic === true;
+            toggleInput.dataset.testid = testData.id;
+            toggleInput.addEventListener('change', handlePublicToggleChange);
+            const sliderSpan = document.createElement('span');
+            sliderSpan.classList.add('slider', 'round');
+            toggleLabel.appendChild(toggleInput);
+            toggleLabel.appendChild(sliderSpan);
+
+            const statusSpan = document.createElement('span');
+            statusSpan.classList.add('public-status');
+            statusSpan.textContent = testData.isPublic === true ? 'Public' : 'Private';
+
+            // Delete Button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.classList.add('admin-delete-btn');
+            deleteBtn.dataset.testid = testData.id;
+            deleteBtn.addEventListener('click', handleDeleteTestClick);
+
+            // Assemble
+            item.appendChild(titleSpan);
+            item.appendChild(detailsSpan);
+            actionsDiv.appendChild(toggleLabel);
+            actionsDiv.appendChild(statusSpan);
+            actionsDiv.appendChild(deleteBtn);
+            // Add Reattempt/View Details buttons here if needed for Admin view
+            item.appendChild(actionsDiv);
+
+            return item;
+        }
+
+        async function handlePublicToggleChange(event) {
+            const checkbox = event.target;
+            const testId = checkbox.dataset.testid;
+            const newStatus = checkbox.checked;
+            const statusSpan = checkbox.closest('.admin-actions').querySelector('.public-status');
+
+            console.log(`Toggling test ${testId} to ${newStatus ? 'Public' : 'Private'}`);
+            checkbox.disabled = true; // Disable while updating
+
+            try {
+                const testDocRef = db.collection('testReviews').doc(testId);
+                await testDocRef.update({
+                    isPublic: newStatus
+                });
+                console.log(`Test ${testId} updated successfully.`);
+                if(statusSpan) statusSpan.textContent = newStatus ? 'Public' : 'Private';
+            } catch (error) {
+                console.error(`Error updating test ${testId} status:`, error);
+                alert('Failed to update test status. Please try again.');
+                // Revert checkbox state on error
+                checkbox.checked = !newStatus;
+                if(statusSpan) statusSpan.textContent = !newStatus ? 'Public' : 'Private';
+
+            } finally {
+                checkbox.disabled = false; // Re-enable
+            }
+        }
+
+        async function handleDeleteTestClick(event) {
+            const testId = event.target.dataset.testid;
+            const listItem = event.target.closest('.admin-test-item');
+            const title = listItem?.querySelector('.test-title')?.textContent || 'this test';
+
+             if (!testId) return;
+
+            if (confirm(`Are you sure you want to delete the test "${title}" permanently? This cannot be undone.`)) {
+                setLoading(true, "Deleting test...");
+                try {
+                    // Optional: Delete messages if related (might be complex/unnecessary)
+                    // Delete the review document
+                    await db.collection('testReviews').doc(testId).delete();
+                    console.log(`Deleted test ${testId}`);
+                    listItem?.remove(); // Remove from UI
+                    alert('Test deleted successfully.');
+                } catch (error) {
+                    console.error(`Error deleting test ${testId}:`, error);
+                    alert('Failed to delete the test.');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        }
+
+        // --- User Dashboard Functions ---
+        async function loadPublicTests() {
+            userTestListContainer.innerHTML = '<p>Loading available tests...</p>';
+             try {
+                const snapshot = await db.collection('testReviews')
+                                        .where('isPublic', '==', true)
+                                        .orderBy('savedAt', 'desc') // Or order by title?
+                                        .get();
+
+                if (snapshot.empty) {
+                    userTestListContainer.innerHTML = '<p>No public tests available at the moment.</p>';
+                    return;
+                }
+
+                userTestListContainer.innerHTML = ''; // Clear loading message
+                snapshot.forEach(doc => {
+                    const testData = { id: doc.id, ...doc.data() };
+                     // Ensure test has questions before showing
+                     if (testData.originalMCQs && testData.originalMCQs.length > 0) {
+                         const testItem = createUserTestListItem(testData);
+                         userTestListContainer.appendChild(testItem);
+                     } else {
+                         console.warn(`Skipping public test ${testData.id} as it has no questions.`);
+                     }
+                });
+            } catch (error) {
+                console.error("Error loading public tests:", error);
+                userTestListContainer.innerHTML = '<p style="color: red;">Error loading available tests.</p>';
+            }
+        }
+
+        function createUserTestListItem(testData) {
+             const item = document.createElement('div');
+            item.classList.add('user-test-item');
+            item.dataset.testid = testData.id;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.classList.add('test-title');
+            titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+
+             const detailsSpan = document.createElement('span');
+            detailsSpan.classList.add('test-details');
+            detailsSpan.textContent = `${testData.originalMCQs?.length || 0} Questions`; // Example detail
+
+            const startBtn = document.createElement('button');
+            startBtn.textContent = 'Start Test';
+            startBtn.classList.add('start-test-btn');
+            startBtn.dataset.testid = testData.id;
+            startBtn.addEventListener('click', handleStartTestClick);
+
+             // Assemble
+            item.appendChild(titleSpan);
+            item.appendChild(detailsSpan);
+            item.appendChild(startBtn);
+
+            return item;
+        }
+
+         async function handleStartTestClick(event) {
+             const testId = event.target.dataset.testid;
+             if (!testId) return;
+
+             setLoading(true, "Loading test questions...");
+             try {
+                 const testDocRef = db.collection('testReviews').doc(testId);
+                 const docSnap = await testDocRef.get();
+
+                 if (!docSnap.exists) {
+                     throw new Error("Test not found.");
+                 }
+
+                 const testData = docSnap.data();
+                 const mcqs = testData.originalMCQs;
+
+                 if (!mcqs || mcqs.length === 0) {
+                      throw new Error("Selected test has no questions.");
+                 }
+
+                 // Reset test state
+                 currentTestMCQs = mcqs;
+                 currentQuestionIndex = 0;
+                 // Initialize userAnswers array, supporting marked status
+                 userAnswers = new Array(mcqs.length).fill(null).map(() => ({ answerIndex: null, marked: false }));
+                 reviewResultsCache = null;
+
+                 // Display the first question and start timer
+                 displayTestQuestion(0); // Make sure this function updates palette too
+                 renderQuestionPalette(); // Initial render
+                 updatePaletteHighlight(); // Highlight first question
+                 startTestTimer();
+
+                 // Show the test view
+                 showView('mock-test-view');
+                 testTitle.textContent = testData.testTitle || "Mock Test"; // Set test title
+
+             } catch (error) {
+                 console.error(`Error starting test ${testId}:`, error);
+                 alert(`Failed to load test: ${error.message}`);
+             } finally {
+                 setLoading(false);
+             }
+         }
+
+
+        // --- Mock Test Functions (with enhancements) ---
+        function displayTestQuestion(index) {
+             // Existing logic from your previous code...
+             if (index < 0 || index >= currentTestMCQs.length) return;
+             currentQuestionIndex = index;
+             const questionData = currentTestMCQs[index];
+             const questionText = questionData.question?.en || "(Question missing)"; // Assuming English for now
+             testQuestionNumber.textContent = `Question ${index + 1}`;
+             testQuestion.innerHTML = questionText; // Use innerHTML if question contains HTML/MathJax
+             testOptionsContainer.innerHTML = '';
+             const options = questionData.options || [];
+             const optionLetters = ['A', 'B', 'C', 'D'];
+             const currentAnswer = userAnswers[index]; // Get object { answerIndex, marked }
+
+             options.forEach((optionObj, optionIndex) => {
+                 if (optionIndex >= optionLetters.length) return;
+                 const optionText = optionObj?.en || '(Option missing)';
+                 const label = document.createElement('label');
+                 const input = document.createElement('input');
+                 input.type = 'radio';
+                 input.name = `q_${index}`;
+                 input.value = optionIndex;
+                 // Check answerIndex from the state object
+                 input.checked = (currentAnswer?.answerIndex === optionIndex);
+                 input.addEventListener('change', () => handleOptionSelect(optionIndex));
+                 label.appendChild(input);
+                 label.appendChild(document.createTextNode(` ${optionLetters[optionIndex]}. ${optionText}`));
+                 testOptionsContainer.appendChild(label);
+             });
+
+            // Typeset MathJax if needed (like in your previous code)
+             if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+                setTimeout(() => { // Delay ensures DOM update
+                     MathJax.typesetPromise([testQuestion, testOptionsContainer])
+                           .catch(err => console.error('MathJax Test Q Error:', err));
+                }, 50);
+             }
+
+             // Update Navigation Buttons
+             prevQuestionBtn.disabled = (index === 0);
+             nextQuestionBtn.disabled = (index === currentTestMCQs.length - 1);
+             questionCounter.textContent = `Q: ${index + 1} / ${currentTestMCQs.length}`;
+
+             // Update Palette Highlight
+             updatePaletteHighlight();
+             // Update Mark for Review Button Status
+             markReviewBtn.textContent = currentAnswer?.marked ? 'Unmark Review' : 'Mark for Review';
+
+         }
+
+        function renderQuestionPalette() {
+            questionPalette.innerHTML = '';
+             for (let i = 0; i < currentTestMCQs.length; i++) {
+                 const button = document.createElement('button');
+                 button.textContent = i + 1;
+                 button.dataset.qindex = i;
+                 button.addEventListener('click', handlePaletteClick);
+                 updatePaletteButtonStatus(button, i); // Set initial style
+                 questionPalette.appendChild(button);
+             }
+        }
+
+        function updatePaletteButtonStatus(button, index) {
+             const answerState = userAnswers[index];
+             button.classList.remove('answered', 'marked', 'current'); // Clear previous styles
+             if(answerState?.answerIndex !== null && answerState?.answerIndex !== undefined) {
+                 button.classList.add('answered');
+             }
+             if(answerState?.marked) {
+                 button.classList.add('marked');
+             }
+             if(index === currentQuestionIndex) {
+                 button.classList.add('current');
+             }
+        }
+
+        function updatePaletteHighlight() {
+             questionPalette.querySelectorAll('button').forEach(button => {
+                const index = parseInt(button.dataset.qindex, 10);
+                updatePaletteButtonStatus(button, index); // Update style based on current state
+             });
+        }
+
+         function handlePaletteClick(event) {
+             const index = parseInt(event.target.dataset.qindex, 10);
+             if (!isNaN(index) && index >= 0 && index < currentTestMCQs.length) {
+                 displayTestQuestion(index);
+             }
+         }
+
+        function handleOptionSelect(optionIndex) {
+             // Update state object
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].answerIndex = optionIndex;
+             } else {
+                 // Should not happen if initialized correctly, but handle defensively
+                 userAnswers[currentQuestionIndex] = { answerIndex: optionIndex, marked: false };
+             }
+             console.log(`Answered Q${currentQuestionIndex + 1}: Option ${optionIndex}`);
+             updatePaletteHighlight(); // Update palette appearance
+        }
+
+         function handleMarkReviewClick() {
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].marked = !userAnswers[currentQuestionIndex].marked;
+                 markReviewBtn.textContent = userAnswers[currentQuestionIndex].marked ? 'Unmark Review' : 'Mark for Review';
+                 updatePaletteHighlight(); // Update palette appearance
+             }
+         }
+
+         function handleClearResponseClick() {
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].answerIndex = null; // Set answer to null
+                 // Uncheck radio buttons visually
+                 const radioButtons = testOptionsContainer.querySelectorAll(`input[name="q_${currentQuestionIndex}"]`);
+                 radioButtons.forEach(rb => rb.checked = false);
+                 updatePaletteHighlight(); // Update palette appearance
+             }
+         }
+
+
+        function handleTestNavigation(direction) {
+             // Same as your previous code
+            let newIndex = currentQuestionIndex;
+            if (direction === 'prev' && currentQuestionIndex > 0) newIndex--;
+            else if (direction === 'next' && currentQuestionIndex < currentTestMCQs.length - 1) newIndex++;
+
+            if (newIndex !== currentQuestionIndex) {
+                displayTestQuestion(newIndex);
+            }
+        }
+
+        function startTestTimer() {
+             // Same as your previous code
+            if (testTimerInterval) clearInterval(testTimerInterval);
+            testStartTime = Date.now();
+            testTimer.textContent = `Time: 00:00`;
+            testTimerInterval = setInterval(() => {
+                 const elapsedSeconds = Math.floor((Date.now() - testStartTime) / 1000);
+                 const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                 const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+                 testTimer.textContent = `Time: ${minutes}:${seconds}`;
+            }, 1000);
+        }
+
+        function submitTest() {
+             // Same as your previous code, but use the new userAnswers structure
+            if (!confirm("Are you sure you want to submit the test?")) return;
+
+            if (testTimerInterval) clearInterval(testTimerInterval);
+            const endTime = Date.now();
+            const timeTakenMs = testStartTime ? endTime - testStartTime : 0;
+
+            // Calculate results using the new structure
+            reviewResultsCache = calculateResults(currentTestMCQs, userAnswers, timeTakenMs);
+
+            // Show review view
+            displayReview(reviewResultsCache); // Make sure displayReview handles the new cache structure
+            showView('review-view');
+         }
+
+         function calculateResults(mcqs, answersState, timeMs) {
+            let correctCount = 0, incorrectCount = 0, skippedCount = 0;
+            const reviewQuestions = [];
+
+            mcqs.forEach((q, idx) => {
+                const uAnswerState = answersState[idx]; // { answerIndex: null/0/1.., marked: false }
+                const uAIdx = uAnswerState?.answerIndex;
+
+                const opts = q.options || [];
+                const cALtr = q.answer?.trim().toUpperCase();
+                const cAIdx = cALtr ? cALtr.charCodeAt(0) - 'A'.charCodeAt(0) : -1;
+                const cATxtE = (cAIdx >= 0 && cAIdx < opts.length) ? (opts[cAIdx]?.en || '?') : "N/A";
+
+                let uATxtE = "Skipped";
+                let st = "skipped";
+
+                if (uAIdx !== null && uAIdx !== undefined && uAIdx >= 0 && uAIdx < opts.length) {
+                    uATxtE = opts[uAIdx]?.en || '?';
+                    if (uAIdx === cAIdx) {
+                        st = "correct"; correctCount++;
+                    } else {
+                        st = "incorrect"; incorrectCount++;
+                    }
+                } else if (uAIdx !== null && uAIdx !== undefined) { // Invalid index selected?
+                     uATxtE = "Invalid Option"; st = "incorrect"; incorrectCount++;
+                } else {
+                    skippedCount++; // Answer index is null/undefined
+                }
+
+                reviewQuestions.push({
+                    question: q.question?.en || '?',
+                    correctAnswer: cATxtE,
+                    userAnswer: uATxtE,
+                    status: st,
+                    explanation: q.explanation?.en || "N/A",
+                    markedForReview: uAnswerState?.marked || false // Store marked status
+                });
+            });
+
+            const total = mcqs.length;
+            const score = `${correctCount}/${total}`;
+            const timeS = Math.round(timeMs / 1000);
+            const mins = Math.floor(timeS / 60);
+            const secs = timeS % 60;
+            const timeStr = `${mins}m ${secs}s`;
+
+            return {
+                questions: reviewQuestions,
+                summary: { score, correct: correctCount, incorrect: incorrectCount, skipped: skippedCount, timeString: timeStr },
+                testDate: new Date().toISOString(),
+                timeTakenMs: timeMs,
+                // sourceChatId: activeChatId, // Maybe not relevant here if started from public list
+                testTitle: testTitle.textContent, // Get title from the test view header
+                originalMCQs: mcqs // Keep original MCQs for reattempt if needed
+            };
+         }
+
+        // --- Review Functions ---
+        function displayReview(reviewData) {
+            // Needs update to handle the structure from calculateResults
+             reviewContent.innerHTML = '';
+             reviewSummary.innerHTML = '';
+             reviewFilters.style.display = 'none';
+
+             if (!reviewData?.questions?.length || !reviewData.summary) {
+                reviewSummary.innerHTML = "<span>No review data available.</span>";
+                return;
+             }
+
+             const { score, correct, incorrect, skipped, timeString } = reviewData.summary;
+             reviewSummary.innerHTML = `<span>Score: ${score}</span> | <span class="score-correct">Correct: ${correct}</span> | <span class="score-incorrect">Incorrect: ${incorrect}</span> | <span class="score-skipped">Skipped: ${skipped}</span> | <span>Time: ${timeString}</span>`;
+             reviewTitle.textContent = reviewData.testTitle || "Test Review";
+
+             reviewData.questions.forEach((qSum, idx) => {
+                 const rItem = document.createElement('div');
+                 rItem.classList.add('review-item');
+                 rItem.dataset.status = qSum.status; // For filtering
+
+                 let answerHtml = '';
+                 const userAnsClass = `user-answer-${qSum.status}`;
+                 answerHtml += `<span class="${userAnsClass}">Your Answer: ${qSum.userAnswer} ${qSum.markedForReview ? '(Marked)' : ''}</span>`;
+
+                 if (qSum.status !== 'correct') {
+                    answerHtml += `<br><span class="correct-answer">Correct Answer: ${qSum.correctAnswer}</span>`;
+                 }
+
+                 rItem.innerHTML = `
+                    <div class="review-item-qnum">Q ${idx + 1}</div>
+                    <div class="review-item-question">${qSum.question}</div>
+                    <div class="review-item-details">
+                        ${answerHtml}
+                        <div class="review-item-explanation" style="margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee;">Explanation: ${qSum.explanation}</div>
+                    </div>
+                 `;
+                 reviewContent.appendChild(rItem);
+             });
+
+             // Show filters if needed
+             if (incorrect > 0 || skipped > 0) {
+                 reviewFilters.style.display = 'block';
+                 filterReviewItems('all'); // Reset filter
+                 reviewFilters.querySelectorAll('button').forEach(btn => {
+                     btn.classList.toggle('active-filter', btn.dataset.filter === 'all');
+                 });
+             } else {
+                 reviewFilters.style.display = 'none';
+             }
+
+             // Typeset MathJax if needed
+            if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+                setTimeout(() => { // Delay ensures DOM update
+                     MathJax.typesetPromise([reviewContent])
+                           .catch(err => console.error('MathJax Review Error:', err));
+                }, 50);
+             }
+         }
+
+        function filterReviewItems(filter) {
+             // Same as your previous code
+            reviewFilters.querySelectorAll('button').forEach(btn => {
+                btn.classList.toggle('active-filter', btn.dataset.filter === filter);
+            });
+            reviewContent.querySelectorAll('.review-item').forEach(item => {
+                 const show = (filter === 'all') || item.dataset.status === filter;
+                 item.style.display = show ? 'block' : 'none'; // Use display style
+            });
+        }
+
+         function exitReview() {
+             // Go back to the appropriate dashboard based on role
+             reviewResultsCache = null; // Clear cache
+             if (isAdmin) {
+                 showView('admin-dashboard-view');
+             } else {
+                 showView('user-dashboard-view');
+             }
+         }
+
+
+        // --- Event Listeners ---
+        loginBtn.addEventListener('click', signInWithGoogle);
+        adminLogoutBtn.addEventListener('click', signOut);
+        userLogoutBtn.addEventListener('click', signOut);
+        prevQuestionBtn.addEventListener('click', () => handleTestNavigation('prev'));
+        nextQuestionBtn.addEventListener('click', () => handleTestNavigation('next'));
+        submitTestBtn.addEventListener('click', submitTest);
+        exitReviewBtn.addEventListener('click', exitReview);
+        reviewFilters.addEventListener('click', (event) => { // Delegated listener
+            const button = event.target.closest('button[data-filter]');
+            if (button) filterReviewItems(button.dataset.filter);
+        });
+        markReviewBtn.addEventListener('click', handleMarkReviewClick);
+        clearResponseBtn.addEventListener('click', handleClearResponseClick);
+
+        // Add other listeners (e.g., for admin test list interactions if needed)
+
+        // --- Utility Functions ---
+        // Add any other helper functions you need
+
+
+    </script>
+
+</body>
+</html>
