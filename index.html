@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Test Portal (Admin & User)</title>
+    <title>Unified Test Portal (Admin & User)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,6 +42,11 @@
             --border-radius: 8px;
         }
 
+        /* Basic Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: var(--font-family);
             margin: 0;
@@ -57,19 +62,19 @@
 
         #app-root {
             width: 100%;
-            max-width: 1200px; /* Limit max width for better readability on large screens */
+            max-width: 1200px; /* Limit max width */
             background-color: #fff;
             box-shadow: var(--shadow-md);
-            margin: 20px 0; /* Add some margin */
+            margin: 20px 0;
             border-radius: var(--border-radius);
-            overflow: hidden; /* Contain children */
+            overflow: hidden;
         }
 
         .view-container {
-            display: none;
+            display: none; /* Hide all views by default */
             flex-direction: column;
             box-sizing: border-box;
-            padding: 30px 5%; /* Consistent padding */
+            padding: 30px 5%;
             opacity: 0;
             animation: fadeIn 0.5s ease-in-out forwards;
         }
@@ -80,7 +85,7 @@
         }
 
         .view-container.active-view {
-            display: flex;
+            display: flex; /* Show only the active view */
         }
 
         h2, h3 {
@@ -112,7 +117,7 @@
         }
         button:hover:not(:disabled) { background-color: #357abd; box-shadow: var(--shadow-md); transform: translateY(-1px);}
         button:active:not(:disabled) { transform: translateY(0px); box-shadow: var(--shadow-sm); }
-        button:disabled { background-color: #cccccc; color: #666666; cursor: not-allowed; box-shadow: none; }
+        button:disabled { background-color: #cccccc; color: #666666; cursor: not-allowed; box-shadow: none; opacity: 0.7;}
         button.secondary { background-color: #6c757d; }
         button.secondary:hover:not(:disabled) { background-color: #5a6268; }
         button.danger { background-color: var(--danger-color); }
@@ -120,7 +125,7 @@
 
         /* --- Login View --- */
         #login-view {
-            min-height: 400px; /* Give login view some height */
+            min-height: 400px;
             justify-content: center; align-items: center; text-align: center;
         }
         #login-view h2 { margin-bottom: 1rem; font-size: 1.8em;}
@@ -142,7 +147,7 @@
         }
          .dashboard-header h2 { margin-bottom: 0; }
         .user-info span { margin-right: 15px; font-weight: 500; color: #495057; }
-        .test-list-container { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); } /* Responsive Grid */
+        .test-list-container { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
 
         .test-card {
             background-color: var(--card-bg); border-radius: var(--border-radius);
@@ -158,7 +163,7 @@
         /* Admin Specific Card Styles */
         .admin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; }
         .public-status-label { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
-        .public-status { font-size: 0.9em; font-weight: 500; padding: 4px 10px; border-radius: 15px; } /* Pill shape */
+        .public-status { font-size: 0.9em; font-weight: 500; padding: 4px 10px; border-radius: 15px; }
         .public-status.public { color: #1b6a2f; background-color: #d1f7c4; border: 1px solid #a3e9a4; }
         .public-status.private { color: #5a6268; background-color: #e9ecef; border: 1px solid #ced4da; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
@@ -182,20 +187,21 @@
         #question-palette button.answered { background-color: var(--success-color); color: white; border-color: var(--success-color); }
         #question-palette button.marked { border: 2px solid var(--accent-color); line-height: 32px; /* Adjust for border */ }
         #question-palette button.current { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 600; transform: scale(1.1); box-shadow: var(--shadow-md); }
-        .palette-legend { font-size: 0.85em; color: #6c757d; }
+        .palette-legend { font-size: 0.85em; color: #6c757d; margin-top: 10px; }
         .palette-legend p { margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         .legend-color { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
         .test-question-number { font-weight: 600; color: #6c757d; margin-bottom: 10px; }
         .test-question { font-size: 1.15em; margin-bottom: 25px; line-height: 1.7; }
-        .test-options label { display: block; margin-bottom: 12px; padding: 15px 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; background-color: var(--card-bg); }
+        .test-options label { display: block; margin-bottom: 12px; padding: 15px 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; background-color: var(--card-bg); position: relative; padding-left: 45px; } /* Adjusted padding */
         .test-options label:hover { background-color: #eef5ff; border-color: var(--primary-color); }
-        .test-options input[type="radio"] { display: none; /* Hide radio button */ }
-        .test-options input[type="radio"]:checked + span { /* Style text or add custom radio */ font-weight: 600; color: var(--primary-color); }
-        .test-options label { /* Add custom radio style if desired */ position: relative; padding-left: 35px; }
-        .test-options label::before { /* Custom radio outer circle */ content: ''; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border: 2px solid var(--border-color); border-radius: 50%; background: #fff; }
-        .test-options label:hover::before { border-color: var(--primary-color); }
-        .test-options input[type="radio"]:checked + span + ::before { border-color: var(--primary-color); background-color: #fff; }
-        .test-options input[type="radio"]:checked + span + ::after { /* Custom radio inner dot */ content: ''; position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); }
+        .test-options input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;} /* Hide default */
+        .test-options label .option-text { /* Wrap text in a span */ display: block; }
+        .test-options label .radio-custom { /* Custom radio button */ position: absolute; top: 50%; left: 15px; height: 20px; width: 20px; background-color: #fff; border: 2px solid var(--border-color); border-radius: 50%; transform: translateY(-50%); transition: border-color 0.2s ease; }
+        .test-options label:hover .radio-custom { border-color: var(--primary-color); }
+        .test-options input[type="radio"]:checked ~ .radio-custom { background-color: #fff; border-color: var(--primary-color); }
+        .test-options .radio-custom::after { /* Inner dot */ content: ""; position: absolute; display: none; top: 50%; left: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); transform: translate(-50%, -50%); }
+        .test-options input[type="radio"]:checked ~ .radio-custom::after { display: block; }
+        .test-options input[type="radio"]:checked ~ .option-text { /* Style checked text */ font-weight: 600; color: var(--primary-color); }
 
         .test-actions { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 15px; }
         .test-actions button { font-size: 0.9em; padding: 8px 15px; }
@@ -206,7 +212,7 @@
         /* --- Review View --- */
         .review-summary { margin-bottom: 20px; padding: 15px; background-color: var(--light-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-around; }
         .review-summary span { font-weight: 500; font-size: 1.05em;}
-        .score-correct { color: #28a745; } /* Keep specific colors */
+        .score-correct { color: #28a745; }
         .score-incorrect { color: #dc3545; }
         .score-skipped { color: #fd7e14; }
         .review-filters { margin-bottom: 20px; }
@@ -216,10 +222,10 @@
         .review-item-qnum { font-weight: 600; color: var(--primary-color); margin-bottom: 8px; }
         .review-item-question { margin-bottom: 15px; font-weight: 500; line-height: 1.7; }
         .review-item-details { font-size: 0.95em; line-height: 1.8; }
-        .review-item-details > span { display: block; margin-bottom: 8px; padding: 5px 10px; border-radius: 4px; }
-        .user-answer-correct { background-color: #e4f8d1; color: #1b6a2f; border: 1px solid #a3e9a4; }
-        .user-answer-incorrect { background-color: #fbeaea; color: #dc3545; border: 1px solid #f5c6cb; text-decoration: line-through; }
-        .user-answer-skipped { background-color: #fff3e0; color: #fd7e14; border: 1px solid #ffeeba; font-style: italic; }
+        .review-item-details > span { display: block; margin-bottom: 8px; padding: 8px 12px; border-radius: 4px; border: 1px solid transparent; } /* Added border for consistency */
+        .user-answer-correct { background-color: #e4f8d1; color: #1b6a2f; border-color: #a3e9a4; }
+        .user-answer-incorrect { background-color: #fbeaea; color: #dc3545; border-color: #f5c6cb; text-decoration: line-through; }
+        .user-answer-skipped { background-color: #fff3e0; color: #fd7e14; border-color: #ffeeba; font-style: italic; }
         .correct-answer { font-weight: bold; color: #28a745; background-color: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 5px;}
         .review-item-explanation { margin-top: 12px; padding: 12px 15px; background-color: #f8f9fa; border-left: 4px solid var(--secondary-color); border-radius: 0 4px 4px 0; font-size: 0.9em; color: #495057; }
         .review-footer { text-align: center; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
@@ -231,7 +237,7 @@
         }
         @media (max-width: 767px) { /* Small screens */
             body { font-size: 15px; }
-            #app-root { margin: 0; border-radius: 0; }
+            #app-root { margin: 0; border-radius: 0; box-shadow: none; }
             .view-container { padding: 20px; }
             h2 { font-size: 1.5em; } h3 { font-size: 1.2em; }
             .dashboard-header { flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -247,6 +253,17 @@
             .review-summary { flex-direction: column; gap: 8px; align-items: flex-start; }
             .review-summary span { font-size: 1em;}
             .review-filters { display: flex; flex-wrap: wrap; gap: 8px;}
+        }
+
+        /* Utility Classes */
+        .error-message {
+            color: var(--danger-color);
+            background-color: #fbeaea;
+            border: 1px solid #f5c6cb;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+            font-weight: 500;
         }
 
     </style>
@@ -266,6 +283,7 @@
                  <svg aria-hidden="true" height="18" width="18" viewBox="0 0 18 18" style="vertical-align: middle;"><path d="M16.51 8.1H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z" fill="#4285F4"></path><path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z" fill="#34A853"></path><path d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z" fill="#FBBC05"></path><path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z" fill="#EA4335"></path></svg>
                  <span style="vertical-align: middle; margin-left: 10px;">Login with Google</span>
             </button>
+            <div id="login-error" class="error-message" style="display: none; margin-top: 15px;"></div>
         </div>
 
         <div id="admin-dashboard-view" class="view-container">
@@ -292,6 +310,7 @@
             </div>
             <div id="user-test-list" class="test-list-container">
                 <p>Loading available tests...</p>
+                 <div id="user-test-list-error" class="error-message" style="display: none;"></div>
             </div>
         </div>
 
@@ -323,7 +342,7 @@
                     <div class="palette-legend">
                         <p><span class="legend-color" style="background-color: var(--success-color);"></span> Answered</p>
                         <p><span class="legend-color" style="border: 2px solid var(--accent-color); background-color: #fff;"></span> Marked</p>
-                        <p><span class="legend-color" style="background-color: #fff;"></span> Not Answered</p>
+                        <p><span class="legend-color" style="background-color: #fff; border: 1px solid #ccc;"></span> Not Answered</p>
                         <p><span class="legend-color" style="background-color: var(--primary-color);"></span> Current</p>
                     </div>
                 </div>
@@ -356,23 +375,40 @@
 
     </div> <script>
         // --- Firebase Config ---
-        // ***** உங்கள் உண்மையான Firebase config விவரங்கள் *****
+        // Using the config you provided. Ensure this is 100% correct for your project.
         const firebaseConfig = {
-          apiKey: "AIzaSyDgw604fe5jnNu4kTOv1cQ-3n7PL8gcN58", // <- From your input
-          authDomain: "krish-c5db8.firebaseapp.com",         // <- From your input
-          projectId: "krish-c5db8",                         // <- From your input
-          storageBucket: "krish-c5db8.firebasestorage.app", // <- From your input (Check if .appspot.com is correct via console)
-          messagingSenderId: "217175257890",                // <- From your input
-          appId: "1:217175257890:web:209f0f290eabab6b1fab7b", // <- From your input
-          measurementId: "G-97SHYGL2J4"                     // <- From your input
+          apiKey: "AIzaSyDgw604fe5jnNu4kTOv1cQ-3n7PL8gcN58",
+          authDomain: "krish-c5db8.firebaseapp.com",
+          projectId: "krish-c5db8",
+          storageBucket: "krish-c5db8.firebasestorage.app", // Make sure this is correct (.appspot.com or .firebasestorage.app)
+          messagingSenderId: "217175257890",
+          appId: "1:217175257890:web:209f0f290eabab6b1fab7b",
+          measurementId: "G-97SHYGL2J4"
         };
 
         // --- Initialize Firebase ---
-        console.log("Initializing Firebase...");
-        firebase.initializeApp(firebaseConfig);
-        const fbAuth = firebase.auth();
-        const db = firebase.firestore();
-        console.log("Firebase Initialized.");
+        let fbApp; // Keep a reference if needed
+        let fbAuth;
+        let db;
+        try {
+            console.log("Initializing Firebase...");
+            fbApp = firebase.initializeApp(firebaseConfig);
+            fbAuth = firebase.auth();
+            db = firebase.firestore();
+            console.log("Firebase Initialized successfully.");
+        } catch (error) {
+            console.error("CRITICAL: Firebase initialization failed!", error);
+            // Display a critical error message to the user, as the app cannot function.
+            const loginErrorDiv = document.getElementById('login-error');
+            if(loginErrorDiv) {
+                loginErrorDiv.textContent = `Firebase initialization failed: ${error.message}. Please check console and config.`;
+                loginErrorDiv.style.display = 'block';
+            }
+            // Hide loading overlay if it was shown
+            const loadingOverlayInitial = document.getElementById('loading-overlay');
+            if(loadingOverlayInitial) loadingOverlayInitial.style.display = 'none';
+        }
+
 
         // --- DOM Elements ---
         console.log("Getting DOM Elements...");
@@ -391,6 +427,8 @@
         const userUserEmail = document.getElementById('user-user-email');
         const adminTestListContainer = document.getElementById('admin-test-list');
         const userTestListContainer = document.getElementById('user-test-list');
+        const userTestListError = document.getElementById('user-test-list-error'); // Error message div for user dashboard
+        const loginError = document.getElementById('login-error'); // Error message div for login
         // Test View Elements
         const testTitle = document.getElementById('test-title');
         const questionCounter = document.getElementById('question-counter');
@@ -417,104 +455,139 @@
         let currentUser = null;
         let isAdmin = false;
         let currentView = 'login'; // Tracks the currently active view ID
-        let isAISdkReady = false; // AI SDK specific state
-        let genAI = null; // AI SDK instance
-        let HarmCategory = null; // AI SDK Harm Categories
-        let HarmBlockThreshold = null; // AI SDK Harm Thresholds
+        let isAISdkReady = false; // AI SDK specific state - currently unused in this skeleton
+        let genAI = null; // AI SDK instance - currently unused in this skeleton
+        let HarmCategory = null; // AI SDK Harm Categories - currently unused
+        let HarmBlockThreshold = null; // AI SDK Harm Thresholds - currently unused
         // Test State
-        let currentTestMCQs = [];
-        let currentQuestionIndex = 0;
+        let currentTestMCQs = []; // Holds the questions for the active test
+        let currentQuestionIndex = 0; // Index of the currently displayed question
         let userAnswers = []; // Array of objects: { answerIndex: null/0/1.., marked: false }
-        let testStartTime = null;
-        let testTimerInterval = null;
-        let reviewResultsCache = null; // To hold results after test submission
+        let testStartTime = null; // Timestamp when the test started
+        let testTimerInterval = null; // Interval ID for the test timer
+        let reviewResultsCache = null; // To hold results after test submission for review display
 
         // --- Initialization ---
-        initializeApp();
+        // Check if Firebase initialized correctly before proceeding
+        if (fbAuth) {
+            initializeApp();
+        }
 
         // ***********************************************
-        // ** **
-        // ** உங்கள் JavaScript தர்க்கத்தை (Logic)       **
-        // ** இங்குதான் சேர்க்க வேண்டும்.               **
-        // ** (Add your JavaScript logic below)       **
-        // ** **
+        // ** JAVASCRIPT LOGIC IMPLEMENTATION NEEDED BELOW **
         // ***********************************************
 
         // --- Core Functions ---
+
+        /**
+         * Initializes the application by setting up the auth state listener.
+         */
         function initializeApp() {
             setLoading(true, "Initializing App...");
-            // Listen for AI SDK load event (already added in <head>)
+            // Listen for authentication state changes
             fbAuth.onAuthStateChanged(handleAuthStateChange);
-            // Initial check in case auth state is already known
-            if (fbAuth.currentUser) {
-                 handleAuthStateChange(fbAuth.currentUser);
-             } else {
-                 showView('login-view'); // Show login if no user initially
-                 setLoading(false);
-             }
+
+            // Handle potential race condition if auth state is already known
+            // when the listener is attached.
+            const initialUser = fbAuth.currentUser;
+            if (initialUser) {
+                console.log("Initial user found on load.");
+                handleAuthStateChange(initialUser);
+            } else {
+                console.log("No initial user found.");
+                showView('login-view'); // Show login if no user
+                setLoading(false);
+            }
+            console.log("App Initialized.");
         }
 
+        /**
+         * Handles changes in Firebase authentication state (login/logout).
+         * Checks admin status and shows the appropriate dashboard.
+         * @param {firebase.User | null} user The logged-in user object or null if logged out.
+         */
         async function handleAuthStateChange(user) {
-            setLoading(true, user ? "Verifying user..." : "Logging out...");
-            currentUser = user; // Set global currentUser
+            console.log("Auth state changed. User:", user ? user.uid : 'None');
+            // Clear test state if user logs out or changes
+            if (testTimerInterval) clearInterval(testTimerInterval);
+            currentTestMCQs = []; userAnswers = []; reviewResultsCache = null;
 
             if (user) {
-                console.log("User logged in:", user.uid, user.email);
+                setLoading(true, "Verifying user...");
+                currentUser = user; // Set global currentUser
                 try {
-                    isAdmin = await checkAdminStatus(user.uid); // Check admin status
+                    isAdmin = await checkAdminStatus(user.uid);
                     console.log("Admin Status:", isAdmin);
-                    updateUserInfoUI(user); // Update UI with user info
+                    updateUserInfoUI(user);
 
                     if (isAdmin) {
                         showView('admin-dashboard-view');
-                        await loadAdminTests(user.uid); // Load tests for admin
+                        await loadAdminTests(user.uid);
                     } else {
                         showView('user-dashboard-view');
-                        await loadPublicTests(); // Load public tests for user
+                        await loadPublicTests();
                     }
                 } catch (error) {
                      console.error("Error during post-login setup:", error);
-                     // Show error message? Fallback to user view?
-                     showView('user-dashboard-view'); // Default to user view on error maybe
-                     await loadPublicTests();
+                     alert(`Error setting up dashboard: ${error.message}`);
+                     showView('user-dashboard-view'); // Default to user view on error
+                     await loadPublicTests(); // Attempt to load public tests anyway
                 } finally {
                     setLoading(false);
                 }
             } else {
-                console.log("User logged out.");
+                setLoading(true, "Logging out..."); // Show loading briefly on logout
+                currentUser = null;
                 isAdmin = false;
-                currentTestMCQs = []; // Clear any ongoing test state
-                if (testTimerInterval) clearInterval(testTimerInterval);
-                showView('login-view'); // Show login view on logout
-                setLoading(false);
+                showView('login-view');
+                // Short delay before hiding loading on logout for smoother transition
+                setTimeout(() => setLoading(false), 200);
             }
         }
 
+        /**
+         * Checks if the given userId belongs to an admin by checking the 'admins' collection.
+         * @param {string} userId The user's Firebase UID.
+         * @returns {Promise<boolean>} True if the user is an admin, false otherwise.
+         */
         async function checkAdminStatus(userId) {
-            // (Firestore 'admins' collection check logic here - from previous response)
+            // TODO: Implement Firestore query to check if userId exists in 'admins' collection.
+            // Remember to set appropriate Firestore Security Rules for the 'admins' collection.
+            console.log(`Checking admin status for ${userId}...`);
              if (!userId) return false;
              try {
-                 const adminDocRef = db.collection('admins').doc(userId); // Collection name 'admins'
+                 const adminDocRef = db.collection('admins').doc(userId);
                  const docSnap = await adminDocRef.get();
-                 console.log(`Admin check for ${userId}: ${docSnap.exists}`);
+                 console.log(`Admin check result: ${docSnap.exists}`);
                  return docSnap.exists;
              } catch (error) {
                  console.error("Error checking admin status:", error);
+                 // Decide how to handle errors - default to non-admin for safety
                  return false;
              }
         }
 
+        /**
+         * Updates the user email display in the dashboard headers.
+         * @param {firebase.User} user The logged-in user object.
+         */
         function updateUserInfoUI(user) {
-             // (Update email spans logic here - from previous response)
+            // TODO: Update the text content of adminUserEmail and userUserEmail spans.
              if (!user) return;
              const email = user.email || "User";
              if(adminUserEmail) adminUserEmail.textContent = email;
              if(userUserEmail) userUserEmail.textContent = email;
+             console.log("User info UI updated.");
         }
 
+        /**
+         * Shows the specified view container and hides others.
+         * @param {string} viewId The ID of the view container div to show.
+         */
         function showView(viewId) {
-             // (Hide all views, show target view logic here - from previous response)
-            console.log("Showing view:", viewId);
+            // TODO: Implement logic to add 'active-view' class to the target view
+            // and remove it from all other '.view-container' elements.
+            console.log("Switching view to:", viewId);
             document.querySelectorAll('.view-container').forEach(view => {
                 view.classList.remove('active-view');
             });
@@ -522,8 +595,8 @@
             if (targetView) {
                 targetView.classList.add('active-view');
                 currentView = viewId;
-                 // Special focus handling maybe
-                 if (viewId === 'login-view') loginBtn?.focus();
+                 // Reset scroll position when changing views
+                 window.scrollTo(0, 0);
             } else {
                 console.error("View not found:", viewId);
                 document.getElementById('login-view')?.classList.add('active-view'); // Fallback
@@ -531,192 +604,271 @@
             }
         }
 
+        /**
+         * Shows or hides the loading overlay and disables/enables UI elements.
+         * @param {boolean} isLoading True to show loading, false to hide.
+         * @param {string} [message="Loading..."] The message to display.
+         */
         function setLoading(isLoading, message = "Loading...") {
-            // (Show/hide loading overlay logic here - from previous response)
-             if (loadingOverlay) {
+            // TODO: Implement logic to show/hide loadingOverlay, update loadingMessage,
+            // and disable/enable relevant buttons/inputs based on isLoading state.
+            // Be careful not to disable elements needed to stop the loading (e.g., maybe logout).
+             if (loadingOverlay && loadingMessage) {
                  loadingMessage.textContent = message;
                  loadingOverlay.style.display = isLoading ? 'flex' : 'none';
              }
-             // Basic element disabling (can be refined)
-              const elementsToDisable = document.querySelectorAll('button, input, select, textarea');
-              elementsToDisable.forEach(el => {
-                 // Don't disable the loading overlay itself or elements within it
+
+             // Select potentially interactive elements
+             const elements = document.querySelectorAll('button, input[type="checkbox"].public-toggle-switch');
+
+             elements.forEach(el => {
+                 // Don't disable elements inside the loading overlay itself
                  if (!loadingOverlay || !loadingOverlay.contains(el)) {
-                     // Handle logout buttons specifically - they should be enabled if user *is* logged in even during load? Maybe.
-                     // For simplicity now, disable most things during load.
-                     if (el.id !== 'admin-logout-btn' && el.id !== 'user-logout-btn') { // Keep logout enabled maybe?
-                        el.disabled = isLoading;
-                     } else {
-                        // Only disable logout if logging out, otherwise keep enabled if user exists
-                        if (isLoading && message === 'Logging out...') {
+                     // Handle logout buttons separately: disable only if logging out
+                     if ((el.id === 'admin-logout-btn' || el.id === 'user-logout-btn')) {
+                         if (isLoading && message.toLowerCase().includes('logging out')) {
                              el.disabled = true;
-                        } else {
-                             el.disabled = !currentUser; // Disabled if no user
-                        }
+                         } else {
+                             el.disabled = !currentUser; // Keep enabled if user is logged in, disable otherwise
+                         }
+                     }
+                     // Handle login button separately: disable if loading OR if user is logged in
+                     else if (el.id === 'login-google-btn') {
+                         el.disabled = isLoading || !!currentUser;
+                     }
+                     // Disable other elements when loading is true
+                     else {
+                         el.disabled = isLoading;
                      }
                  }
-              });
-               // Ensure login button is handled correctly
-              loginBtn.disabled = isLoading || !!currentUser; // Disable if loading OR if user is logged in
+             });
+            console.log(`Loading state set to ${isLoading} with message: ${message}`);
         }
 
 
         // --- Authentication Functions ---
+
+        /**
+         * Initiates the Google Sign-In popup flow.
+         */
         async function signInWithGoogle() {
-             // (Google Sign In logic here - from previous response)
+            // TODO: Implement Firebase Google Sign-In popup.
+            // handleAuthStateChange will manage the result.
              const provider = new firebase.auth.GoogleAuthProvider();
-             try { setLoading(true, "Logging in..."); await fbAuth.signInWithPopup(provider); /* onAuthStateChanged handles the rest */ }
-             catch (error) { console.error("Google Sign-In Error:", error); alert(`Login failed: ${error.message}`); setLoading(false); }
+             // Add scopes if needed, e.g., provider.addScope('profile');
+             try {
+                 setLoading(true, "Redirecting to Google..."); // Indicate action
+                 console.log("Starting Google Sign-In...");
+                 await fbAuth.signInWithPopup(provider);
+                 // No need to setLoading(false) here, onAuthStateChanged will handle it.
+                 console.log("Sign-in popup closed.");
+             } catch (error) {
+                 console.error("Google Sign-In Error:", error);
+                 loginError.textContent = `Login failed: ${error.code || error.message}`;
+                 loginError.style.display = 'block';
+                 setLoading(false); // Hide loading on error
+             }
         }
 
+        /**
+         * Signs the current user out.
+         */
         async function signOut() {
-             // (Sign out logic here - from previous response)
-              try { setLoading(true, "Logging out..."); await fbAuth.signOut(); /* onAuthStateChanged handles the rest */ }
-             catch (error) { console.error("Sign Out Error:", error); alert(`Logout failed: ${error.message}`); setLoading(false); }
+            // TODO: Implement Firebase Sign Out.
+            // handleAuthStateChange will manage the result.
+             try {
+                 setLoading(true, "Logging out...");
+                 await fbAuth.signOut();
+                 console.log("Sign out successful.");
+                 // No need to setLoading(false) here, onAuthStateChanged will handle it.
+             } catch (error) {
+                 console.error("Sign Out Error:", error);
+                 alert(`Logout failed: ${error.message}`); // Simple alert for logout error
+                 setLoading(false); // Hide loading on error
+             }
         }
 
 
         // --- Admin Dashboard Functions ---
+
+        /**
+         * Loads tests created by the current admin from Firestore.
+         * @param {string} adminUserId The UID of the admin user.
+         */
         async function loadAdminTests(adminUserId) {
-             // (Firestore query & render logic here - from previous response)
-             // Use createAdminTestListItem to append items
-              if (!adminUserId) return;
-              adminTestListContainer.innerHTML = '<p>Loading your tests...</p>'; // Use loading overlay instead?
-              setLoading(true, "Loading Admin Tests...");
-              try {
-                  const snapshot = await db.collection('testReviews')
-                                          .where('userId', '==', adminUserId)
-                                          .orderBy('savedAt', 'desc')
-                                          .get();
+            // TODO: Query 'testReviews' collection where 'userId' == adminUserId.
+            // Order by 'savedAt' descending.
+            // Populate adminTestListContainer using createAdminTestListItem for each test.
+            // Handle empty results and errors.
+             if (!adminUserId) return;
+             adminTestListContainer.innerHTML = '<p>Loading your tests...</p>';
+             setLoading(true, "Loading Admin Tests..."); // Use setLoading
 
-                  adminTestListContainer.innerHTML = ''; // Clear loading message
-                  if (snapshot.empty) {
-                      adminTestListContainer.innerHTML = '<p>You haven\'t saved any tests yet.</p>';
-                  } else {
-                      snapshot.forEach(doc => {
-                          const testData = { id: doc.id, ...doc.data() };
-                          const testItem = createAdminTestListItem(testData); // Assumes this function exists
-                          adminTestListContainer.appendChild(testItem);
-                      });
-                  }
-              } catch (error) {
-                  console.error("Error loading admin tests:", error);
-                  adminTestListContainer.innerHTML = '<p style="color: red;">Error loading your tests.</p>';
-              } finally {
-                   setLoading(false);
-              }
+             try {
+                 const snapshot = await db.collection('testReviews')
+                                         .where('userId', '==', adminUserId)
+                                         .orderBy('savedAt', 'desc')
+                                         .get();
+
+                 adminTestListContainer.innerHTML = ''; // Clear loading message
+                 if (snapshot.empty) {
+                     adminTestListContainer.innerHTML = '<p>You haven\'t created or saved any tests yet.</p>';
+                 } else {
+                     snapshot.forEach(doc => {
+                         const testData = { id: doc.id, ...doc.data() };
+                         // Basic validation: Check if originalMCQs exists, though it might be empty
+                         if (testData.originalMCQs) {
+                            const testItem = createAdminTestListItem(testData);
+                            adminTestListContainer.appendChild(testItem);
+                         } else {
+                            console.warn(`Admin test ${testData.id} skipped - missing originalMCQs field.`);
+                         }
+                     });
+                 }
+             } catch (error) {
+                 console.error("Error loading admin tests:", error);
+                 adminTestListContainer.innerHTML = '<p class="error-message">Error loading your tests. Check console and Firestore rules.</p>';
+             } finally {
+                  setLoading(false); // Stop loading indicator
+             }
         }
 
+        /**
+         * Creates the HTML element for a single test item in the admin dashboard.
+         * @param {object} testData The data for the test from Firestore.
+         * @returns {HTMLElement} The created div element for the test card.
+         */
         function createAdminTestListItem(testData) {
-             // (Create card HTML logic here - from previous response)
-             // Remember to attach event listeners for toggle and delete
-              const item = document.createElement('div');
-              item.className = 'test-card admin-test-item';
-              item.dataset.testid = testData.id;
+            // TODO: Create the card structure (div.test-card.admin-test-item).
+            // Include title, details, toggle switch, status text, delete button.
+            // Add event listeners for the toggle switch and delete button.
+            // Return the created element.
 
-              const contentDiv = document.createElement('div'); // For title and details
+             const item = document.createElement('div');
+             item.className = 'test-card admin-test-item';
+             item.dataset.testid = testData.id;
 
-              const titleSpan = document.createElement('div');
-              titleSpan.className = 'test-title';
-              titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             // Content Section (Title, Details)
+             const contentDiv = document.createElement('div');
+             const titleSpan = document.createElement('div');
+             titleSpan.className = 'test-title';
+             titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             const detailsSpan = document.createElement('div');
+             detailsSpan.className = 'test-details';
+             const dateStr = testData.savedAt?.toDate ? testData.savedAt.toDate().toLocaleDateString() : 'N/A';
+             const qCount = testData.originalMCQs?.length || 0;
+             detailsSpan.textContent = `Saved: ${dateStr} | Score: ${testData.summary?.score || 'N/A'} | ${qCount} Qs`;
+             contentDiv.appendChild(titleSpan);
+             contentDiv.appendChild(detailsSpan);
 
-              const detailsSpan = document.createElement('div');
-              detailsSpan.className = 'test-details';
-              const dateStr = testData.savedAt?.toDate ? testData.savedAt.toDate().toLocaleDateString() : 'N/A';
-              const qCount = testData.originalMCQs?.length || 0;
-              detailsSpan.textContent = `Saved: ${dateStr} | Score: ${testData.summary?.score || 'N/A'} | ${qCount} Qs`;
+             // Actions Section
+             const actionsDiv = document.createElement('div');
+             actionsDiv.className = 'actions admin-actions';
 
-              contentDiv.appendChild(titleSpan);
-              contentDiv.appendChild(detailsSpan);
+             // Public Toggle Label (Container)
+             const toggleLabel = document.createElement('label');
+             toggleLabel.className = 'public-status-label';
+             toggleLabel.title = 'Toggle Public Access';
+             const switchDiv = document.createElement('div'); // Visual switch container
+             switchDiv.className = 'switch';
+             const toggleInput = document.createElement('input'); // The actual checkbox
+             toggleInput.type = 'checkbox';
+             toggleInput.className = 'public-toggle-switch';
+             toggleInput.checked = testData.isPublic === true;
+             toggleInput.dataset.testid = testData.id;
+             toggleInput.addEventListener('change', handlePublicToggleChange); // Attach listener
+             const sliderSpan = document.createElement('span');
+             sliderSpan.className = 'slider round';
+             switchDiv.appendChild(toggleInput);
+             switchDiv.appendChild(sliderSpan);
+             const statusSpan = document.createElement('span'); // Text label (Public/Private)
+             statusSpan.className = 'public-status ' + (testData.isPublic === true ? 'public' : 'private');
+             statusSpan.textContent = testData.isPublic === true ? 'Public' : 'Private';
+             toggleLabel.appendChild(switchDiv);
+             toggleLabel.appendChild(statusSpan);
 
-              const actionsDiv = document.createElement('div');
-              actionsDiv.className = 'actions admin-actions';
+             // Delete Button
+             const deleteBtn = document.createElement('button');
+             deleteBtn.textContent = 'Delete';
+             deleteBtn.className = 'admin-delete-btn danger secondary'; // Use classes for styling
+             deleteBtn.dataset.testid = testData.id;
+             deleteBtn.addEventListener('click', handleDeleteTestClick); // Attach listener
 
-              // Public Toggle Label (Container)
-              const toggleLabel = document.createElement('label');
-              toggleLabel.className = 'public-status-label';
-              toggleLabel.title = 'Toggle Public Access';
+             actionsDiv.appendChild(toggleLabel);
+             actionsDiv.appendChild(deleteBtn);
+             // TODO: Add View/Reattempt buttons if needed for Admin view
 
-              // The actual Switch div
-              const switchDiv = document.createElement('div');
-              switchDiv.className = 'switch';
-              const toggleInput = document.createElement('input');
-              toggleInput.type = 'checkbox';
-              toggleInput.className = 'public-toggle-switch'; // Use class for delegation later if needed
-              toggleInput.checked = testData.isPublic === true;
-              toggleInput.dataset.testid = testData.id; // Link input directly to test ID
-              toggleInput.addEventListener('change', handlePublicToggleChange); // Add listener directly
-              const sliderSpan = document.createElement('span');
-              sliderSpan.className = 'slider round';
-              switchDiv.appendChild(toggleInput);
-              switchDiv.appendChild(sliderSpan);
+             // Assemble Card
+             item.appendChild(contentDiv);
+             item.appendChild(actionsDiv);
 
-              // Status Text
-              const statusSpan = document.createElement('span');
-              statusSpan.className = 'public-status ' + (testData.isPublic === true ? 'public' : 'private');
-              statusSpan.textContent = testData.isPublic === true ? 'Public' : 'Private';
-
-              toggleLabel.appendChild(switchDiv); // Add switch inside label
-              toggleLabel.appendChild(statusSpan); // Add status text inside label
-
-              // Delete Button
-              const deleteBtn = document.createElement('button');
-              deleteBtn.textContent = 'Delete';
-              deleteBtn.className = 'admin-delete-btn danger secondary'; // Add secondary class for styling maybe
-              deleteBtn.dataset.testid = testData.id;
-              deleteBtn.addEventListener('click', handleDeleteTestClick); // Add listener directly
-
-              // Assemble Actions
-              actionsDiv.appendChild(toggleLabel); // Add the whole label
-              actionsDiv.appendChild(deleteBtn);
-              // Add View/Reattempt buttons here if needed
-
-              // Assemble Card
-              item.appendChild(contentDiv);
-              item.appendChild(actionsDiv);
-
-              return item;
+             return item;
         }
 
+        /**
+         * Handles the change event of the public toggle switch for a test.
+         * Updates the 'isPublic' status in Firestore.
+         * @param {Event} event The change event object.
+         */
         async function handlePublicToggleChange(event) {
-             // (Update Firestore logic here - from previous response)
-              const checkbox = event.target;
-              const testId = checkbox.dataset.testid;
-              const newStatus = checkbox.checked;
-              const listItem = checkbox.closest('.admin-test-item');
-              const statusSpan = listItem?.querySelector('.public-status');
-              const toggleLabel = listItem?.querySelector('.public-status-label');
+            // TODO: Get testId and newStatus from event.target.
+            // Disable the checkbox temporarily.
+            // Update the 'isPublic' field in the corresponding Firestore document.
+            // Update the status text (Public/Private) next to the toggle.
+            // Handle errors and re-enable the checkbox.
+             const checkbox = event.target;
+             const testId = checkbox.dataset.testid;
+             const newStatus = checkbox.checked;
+             const listItem = checkbox.closest('.admin-test-item'); // Find parent card
+             const statusSpan = listItem?.querySelector('.public-status');
+             const toggleLabel = listItem?.querySelector('.public-status-label');
 
-              if (!testId || !listItem) return;
+             if (!testId || !listItem) {
+                 console.error("Could not find test ID or list item for toggle change.");
+                 return;
+             }
 
-              console.log(`Toggling test ${testId} to ${newStatus ? 'Public' : 'Private'}`);
-              if (toggleLabel) toggleLabel.style.opacity = '0.5'; // Visual feedback
-              checkbox.disabled = true;
+             console.log(`Toggling test ${testId} to ${newStatus ? 'Public' : 'Private'}`);
+             if (toggleLabel) toggleLabel.style.pointerEvents = 'none'; // Prevent rapid clicks
+             checkbox.disabled = true;
+             setLoading(true, "Updating status..."); // Show overlay
 
-              try {
-                  const testDocRef = db.collection('testReviews').doc(testId);
-                  await testDocRef.update({ isPublic: newStatus });
-                  console.log(`Test ${testId} updated successfully.`);
-                  if (statusSpan) {
-                      statusSpan.textContent = newStatus ? 'Public' : 'Private';
-                      statusSpan.className = 'public-status ' + (newStatus ? 'public' : 'private');
-                  }
-              } catch (error) {
-                  console.error(`Error updating test ${testId} status:`, error);
-                  alert('Failed to update test status. Please try again.');
-                  checkbox.checked = !newStatus; // Revert UI
-                   if (statusSpan) {
-                      statusSpan.textContent = !newStatus ? 'Public' : 'Private';
-                      statusSpan.className = 'public-status ' + (!newStatus ? 'public' : 'private');
-                  }
-              } finally {
-                  checkbox.disabled = false;
-                   if (toggleLabel) toggleLabel.style.opacity = '1';
-              }
+             try {
+                 const testDocRef = db.collection('testReviews').doc(testId);
+                 await testDocRef.update({ isPublic: newStatus }); // Update Firestore
+                 console.log(`Test ${testId} status updated successfully.`);
+                 // Update UI immediately
+                 if (statusSpan) {
+                     statusSpan.textContent = newStatus ? 'Public' : 'Private';
+                     statusSpan.className = 'public-status ' + (newStatus ? 'public' : 'private');
+                 }
+             } catch (error) {
+                 console.error(`Error updating test ${testId} status:`, error);
+                 alert('Failed to update test status. Please check Firestore rules and connection.');
+                 // Revert UI on error
+                 checkbox.checked = !newStatus;
+                 if (statusSpan) {
+                     statusSpan.textContent = !newStatus ? 'Public' : 'Private';
+                     statusSpan.className = 'public-status ' + (!newStatus ? 'public' : 'private');
+                 }
+             } finally {
+                 checkbox.disabled = false;
+                 if (toggleLabel) toggleLabel.style.pointerEvents = 'auto';
+                 setLoading(false); // Hide overlay
+             }
         }
 
+        /**
+         * Handles the click event of the delete button for a test.
+         * Confirms deletion and removes the test document from Firestore.
+         * @param {Event} event The click event object.
+         */
         async function handleDeleteTestClick(event) {
-             // (Confirm and delete Firestore doc logic here - from previous response)
+            // TODO: Get testId from event.target.
+            // Confirm deletion with the user.
+            // If confirmed, delete the Firestore document.
+            // Remove the corresponding list item from the UI.
+            // Handle errors.
              const button = event.target;
              const testId = button.dataset.testid;
              const listItem = button.closest('.admin-test-item');
@@ -724,208 +876,282 @@
 
              if (!testId || !listItem) return;
 
-             if (confirm(`DELETE Test?\n\n"${title}"\n\nThis cannot be undone.`)) {
+             // Confirmation dialog
+             if (confirm(`DELETE TEST\n\n"${title}"\n\nAre you sure? This action cannot be undone.`)) {
                  setLoading(true, "Deleting test...");
-                 button.disabled = true;
-                 listItem.style.opacity = '0.5';
+                 button.disabled = true; // Disable button during deletion
+                 listItem.style.opacity = '0.5'; // Visual feedback
 
                  try {
-                     await db.collection('testReviews').doc(testId).delete();
+                     const testDocRef = db.collection('testReviews').doc(testId);
+                     await testDocRef.delete(); // Delete from Firestore
                      console.log(`Deleted test ${testId}`);
-                     listItem.remove(); // Remove from UI
-                     // Optional: Show a temporary success message instead of alert
+                     listItem.remove(); // Remove from the UI
+                     // Optional: Show a success message
                  } catch (error) {
                      console.error(`Error deleting test ${testId}:`, error);
-                     alert('Failed to delete the test.');
-                     button.disabled = false; // Re-enable button on error
+                     alert('Failed to delete the test. Please check Firestore rules and connection.');
+                     // Restore button and item appearance on error
+                     button.disabled = false;
                      listItem.style.opacity = '1';
                  } finally {
                      setLoading(false);
                  }
+             } else {
+                 console.log(`Deletion cancelled for test ${testId}`);
              }
         }
 
 
         // --- User Dashboard Functions ---
+
+        /**
+         * Loads publicly available tests from Firestore.
+         */
         async function loadPublicTests() {
-             // (Firestore query for isPublic == true & render logic - from previous response)
-             // Use createUserTestListItem to append items
+            // TODO: Query 'testReviews' collection where 'isPublic' == true.
+            // Order by 'savedAt' or title.
+            // Populate userTestListContainer using createUserTestListItem.
+            // Handle empty results and errors (display message in userTestListError).
              userTestListContainer.innerHTML = '<p>Loading available tests...</p>';
-             setLoading(true, "Loading Public Tests...");
+             userTestListError.style.display = 'none'; // Hide previous errors
+             setLoading(true, "Loading Available Tests...");
+
              try {
                  const snapshot = await db.collection('testReviews')
-                                         .where('isPublic', '==', true)
-                                         .orderBy('savedAt', 'desc')
+                                         .where('isPublic', '==', true) // Query for public tests
+                                         .orderBy('savedAt', 'desc') // Example ordering
                                          .get();
 
                  userTestListContainer.innerHTML = ''; // Clear loading message
                  if (snapshot.empty) {
-                     userTestListContainer.innerHTML = '<p>No public tests available at the moment.</p>';
+                     userTestListContainer.innerHTML = '<p>No public tests are available at the moment. Please check back later.</p>';
                  } else {
                      snapshot.forEach(doc => {
                          const testData = { id: doc.id, ...doc.data() };
+                         // Validate data before creating item
                          if (testData.originalMCQs && testData.originalMCQs.length > 0) {
                              const testItem = createUserTestListItem(testData);
                              userTestListContainer.appendChild(testItem);
                          } else {
-                             console.warn(`Skipping public test ${testData.id} as it has no questions.`);
+                             // Log tests that are public but have no questions (might indicate an issue)
+                             console.warn(`Public test ${testData.id} has no questions and will not be displayed.`);
                          }
                      });
                  }
              } catch (error) {
                  console.error("Error loading public tests:", error);
-                 userTestListContainer.innerHTML = '<p style="color: red;">Error loading available tests.</p>';
+                 // Display the specific error message to the user
+                 userTestListContainer.innerHTML = ''; // Clear loading message
+                 userTestListError.textContent = `Error loading available tests. Please try again later. (Details: ${error.message})`;
+                 userTestListError.style.display = 'block';
+                 // This addresses the error shown in the user's screenshot
              } finally {
                  setLoading(false);
              }
         }
 
+        /**
+         * Creates the HTML element for a single test item in the user dashboard.
+         * @param {object} testData The data for the test from Firestore.
+         * @returns {HTMLElement} The created div element for the test card.
+         */
         function createUserTestListItem(testData) {
-             // (Create card HTML logic here - from previous response)
-             // Attach event listener for start button
-              const item = document.createElement('div');
-              item.className = 'test-card user-test-item';
-              item.dataset.testid = testData.id;
+            // TODO: Create the card structure (div.test-card.user-test-item).
+            // Include title, details (like number of questions), and a "Start Test" button.
+            // Add event listener for the start button.
+            // Return the created element.
+             const item = document.createElement('div');
+             item.className = 'test-card user-test-item';
+             item.dataset.testid = testData.id;
 
-              const contentDiv = document.createElement('div');
+             // Content Section
+             const contentDiv = document.createElement('div');
+             const titleSpan = document.createElement('div');
+             titleSpan.className = 'test-title';
+             titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             const detailsSpan = document.createElement('div');
+             detailsSpan.className = 'test-details';
+             const qCount = testData.originalMCQs?.length || 0;
+             detailsSpan.textContent = `${qCount} Questions`; // Display question count
+             contentDiv.appendChild(titleSpan);
+             contentDiv.appendChild(detailsSpan);
 
-              const titleSpan = document.createElement('div');
-              titleSpan.className = 'test-title';
-              titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             // Actions Section
+             const actionsDiv = document.createElement('div');
+             actionsDiv.className = 'actions';
+             const startBtn = document.createElement('button');
+             startBtn.textContent = 'Start Test';
+             startBtn.className = 'start-test-btn'; // Class for event delegation
+             startBtn.dataset.testid = testData.id; // Link button to test ID
+             // Event listener will be added via delegation on the container
 
-              const detailsSpan = document.createElement('div');
-              detailsSpan.className = 'test-details';
-              const qCount = testData.originalMCQs?.length || 0;
-              detailsSpan.textContent = `${qCount} Questions`;
+             actionsDiv.appendChild(startBtn);
 
-              contentDiv.appendChild(titleSpan);
-              contentDiv.appendChild(detailsSpan);
+             // Assemble Card
+             item.appendChild(contentDiv);
+             item.appendChild(actionsDiv);
 
-              const actionsDiv = document.createElement('div');
-              actionsDiv.className = 'actions'; // Simple actions container
-
-              const startBtn = document.createElement('button');
-              startBtn.textContent = 'Start Test';
-              startBtn.className = 'start-test-btn'; // Use class for potential delegation
-              startBtn.dataset.testid = testData.id; // Link button to test ID
-              startBtn.addEventListener('click', handleStartTestClick); // Add listener
-
-              actionsDiv.appendChild(startBtn);
-
-              // Assemble Card
-              item.appendChild(contentDiv);
-              item.appendChild(actionsDiv);
-
-              return item;
+             return item;
         }
 
+        /**
+         * Handles the click event for the "Start Test" button.
+         * Fetches the full test data and transitions to the mock test view.
+         * @param {Event} event The click event object.
+         */
         async function handleStartTestClick(event) {
-             // (Fetch full test data from Firestore using testId & start test logic - from previous response)
-              const button = event.target;
-              const testId = button.dataset.testid;
-              if (!testId) return;
+            // TODO: Get testId from event.target.
+            // Fetch the specific test document (including originalMCQs) from Firestore.
+            // Initialize test state (currentTestMCQs, userAnswers, etc.).
+            // Call displayTestQuestion(0), renderQuestionPalette(), startTestTimer().
+            // Call showView('mock-test-view').
+            // Handle errors.
+             const button = event.target.closest('.start-test-btn'); // Ensure we get the button
+             if (!button) return; // Exit if click wasn't on the button or its child
 
-              setLoading(true, "Loading test questions...");
-              button.disabled = true; // Disable button while loading
+             const testId = button.dataset.testid;
+             if (!testId) {
+                 console.error("Start button clicked but test ID not found.");
+                 return;
+             }
 
-              try {
-                  const testDocRef = db.collection('testReviews').doc(testId);
-                  const docSnap = await testDocRef.get();
+             console.log(`Attempting to start test: ${testId}`);
+             setLoading(true, "Loading test questions...");
+             button.disabled = true; // Prevent multiple clicks
 
-                  if (!docSnap.exists) throw new Error("Test not found.");
+             try {
+                 const testDocRef = db.collection('testReviews').doc(testId);
+                 const docSnap = await testDocRef.get();
 
-                  const testData = docSnap.data();
-                  const mcqs = testData.originalMCQs;
+                 if (!docSnap.exists) {
+                     throw new Error("Test data could not be found. It might have been deleted.");
+                 }
 
-                  if (!mcqs || mcqs.length === 0) throw new Error("Selected test has no questions.");
+                 const testData = docSnap.data();
+                 const mcqs = testData.originalMCQs;
 
-                  // --- Initialize Test State ---
-                  currentTestMCQs = mcqs;
-                  currentQuestionIndex = 0;
-                  userAnswers = new Array(mcqs.length).fill(null).map(() => ({ answerIndex: null, marked: false })); // Reset answers
-                  reviewResultsCache = null;
-                  if (testTimerInterval) clearInterval(testTimerInterval); // Clear any previous timer
+                 if (!mcqs || mcqs.length === 0) {
+                     throw new Error("This test currently has no questions.");
+                 }
 
-                  // --- Setup Test UI ---
-                  testTitle.textContent = testData.testTitle || "Mock Test";
-                  displayTestQuestion(0); // Display first question
-                  renderQuestionPalette(); // Render the palette for this test
-                  startTestTimer(); // Start the timer
+                 // --- Initialize Test State ---
+                 currentTestMCQs = mcqs; // Load questions
+                 currentQuestionIndex = 0; // Start at first question
+                 // Initialize answers array with objects for answer index and marked status
+                 userAnswers = new Array(mcqs.length).fill(null).map(() => ({ answerIndex: null, marked: false }));
+                 reviewResultsCache = null; // Clear previous review data
+                 if (testTimerInterval) clearInterval(testTimerInterval); // Clear old timer
 
-                  showView('mock-test-view'); // Switch to the test view
+                 // --- Setup Test UI ---
+                 testTitle.textContent = testData.testTitle || "Mock Test"; // Set title in test view
+                 displayTestQuestion(0); // Display the first question
+                 renderQuestionPalette(); // Create the palette buttons
+                 startTestTimer(); // Start the clock
 
-              } catch (error) {
-                  console.error(`Error starting test ${testId}:`, error);
-                  alert(`Failed to load test: ${error.message}`);
-                  button.disabled = false; // Re-enable button on error
-              } finally {
-                  setLoading(false);
-              }
+                 showView('mock-test-view'); // Show the test taking screen
+
+             } catch (error) {
+                 console.error(`Error starting test ${testId}:`, error);
+                 alert(`Failed to load test: ${error.message}`);
+                 button.disabled = false; // Re-enable button on error
+             } finally {
+                 setLoading(false); // Hide loading overlay
+             }
         }
 
 
         // --- Mock Test Functions ---
-        // (displayTestQuestion, renderQuestionPalette, updatePaletteButtonStatus, updatePaletteHighlight, handlePaletteClick, handleOptionSelect, handleMarkReviewClick, handleClearResponseClick, handleTestNavigation, startTestTimer, submitTest, calculateResults - ALL from previous response/thought block)
-        function displayTestQuestion(index) {
-             if (index < 0 || index >= currentTestMCQs.length) return;
-             currentQuestionIndex = index;
-             const questionData = currentTestMCQs[index];
-             const questionText = questionData.question?.en || "(Question missing)";
-             testQuestionNumber.textContent = `Question ${index + 1}`;
-             testQuestion.innerHTML = questionText; // Use innerHTML for potential MathJax/HTML
-             testOptionsContainer.innerHTML = ''; // Clear previous options
-             const options = questionData.options || [];
-             const optionLetters = ['A', 'B', 'C', 'D'];
-             const currentAnswer = userAnswers[index]; // { answerIndex, marked }
 
+        /**
+         * Displays a specific question and its options in the test view.
+         * @param {number} index The index of the question to display.
+         */
+        function displayTestQuestion(index) {
+            // TODO: Implement logic as described in previous thoughts/responses.
+            // Get question data from currentTestMCQs[index].
+            // Update testQuestionNumber, testQuestion, testOptionsContainer.
+            // Check the correct radio button based on userAnswers[index].answerIndex.
+            // Update navigation button states (prev/next).
+            // Update question counter.
+            // Update palette highlight.
+            // Update Mark for Review button text/state based on userAnswers[index].marked.
+            // Typeset MathJax if needed.
+             if (index < 0 || index >= currentTestMCQs.length) {
+                console.warn(`Invalid question index requested: ${index}`);
+                return;
+             }
+             currentQuestionIndex = index; // Update global state
+             const questionData = currentTestMCQs[index];
+             const questionText = questionData.question?.en || "(Question text missing)"; // Defaulting to English
+             const options = questionData.options || [];
+             const currentAnswerState = userAnswers[index] || { answerIndex: null, marked: false }; // Ensure state exists
+
+             // Update Question Number and Text
+             testQuestionNumber.textContent = `Question ${index + 1}`;
+             testQuestion.innerHTML = questionText; // Use innerHTML for MathJax/HTML
+
+             // Update Options
+             testOptionsContainer.innerHTML = ''; // Clear previous options
+             const optionLetters = ['A', 'B', 'C', 'D'];
              options.forEach((optionObj, optionIndex) => {
-                 if (optionIndex >= optionLetters.length) return;
-                 const optionText = optionObj?.en || '(Option missing)';
+                 if (optionIndex >= optionLetters.length) return; // Max 4 options assumed
+                 const optionText = optionObj?.en || '(Option text missing)'; // Defaulting to English
+
                  const label = document.createElement('label');
                  const input = document.createElement('input');
                  input.type = 'radio';
-                 input.name = `q_${index}`; // Group radios for the same question
-                 input.value = optionIndex;
-                 input.checked = (currentAnswer?.answerIndex === optionIndex);
-                 input.addEventListener('change', () => handleOptionSelect(optionIndex));
+                 input.name = `q_${index}`; // Group radios
+                 input.value = optionIndex; // Store index as value
+                 input.checked = (currentAnswerState.answerIndex === optionIndex); // Check based on state
+                 input.addEventListener('change', () => handleOptionSelect(optionIndex)); // Add listener
 
-                 const optionTextSpan = document.createElement('span'); // Span to hold text for styling
+                 const optionTextSpan = document.createElement('span');
+                 optionTextSpan.className = 'option-text'; // For styling
                  optionTextSpan.textContent = ` ${optionLetters[optionIndex]}. ${optionText}`;
+
+                 const radioCustomSpan = document.createElement('span'); // For custom radio button style
+                 radioCustomSpan.className = 'radio-custom';
 
                  label.appendChild(input);
                  label.appendChild(optionTextSpan);
-                 // Append hidden pseudo-elements for custom radio styling via CSS
-                 const beforeElement = document.createElement('span'); // Placeholder for ::before
-                 const afterElement = document.createElement('span'); // Placeholder for ::after
-                 label.appendChild(beforeElement);
-                 label.appendChild(afterElement);
-
+                 label.appendChild(radioCustomSpan); // Append custom radio element
 
                  testOptionsContainer.appendChild(label);
              });
 
-             // Typeset MathJax
+             // Typeset MathJax after adding content
              if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
-                setTimeout(() => {
+                setTimeout(() => { // Delay ensures DOM is ready
                      MathJax.typesetPromise([testQuestion, testOptionsContainer])
-                           .catch(err => console.error('MathJax Test Q Error:', err));
+                           .catch(err => console.error('MathJax typesetting error:', err));
                 }, 50);
              }
 
-             // Update Navigation Buttons
+             // Update Navigation and Counter
              prevQuestionBtn.disabled = (index === 0);
              nextQuestionBtn.disabled = (index === currentTestMCQs.length - 1);
              questionCounter.textContent = `Q: ${index + 1} / ${currentTestMCQs.length}`;
 
-             // Update Palette & Mark Button
+             // Update Palette and Mark Button
              updatePaletteHighlight();
-             markReviewBtn.textContent = currentAnswer?.marked ? 'Unmark Review' : 'Mark for Review';
-             markReviewBtn.style.borderColor = currentAnswer?.marked ? 'var(--accent-color)' : ''; // Visual indication maybe
-         }
+             markReviewBtn.textContent = currentAnswerState.marked ? 'Unmark Review' : 'Mark for Review';
+             markReviewBtn.style.borderColor = currentAnswerState.marked ? 'var(--accent-color)' : '';
+        }
 
+        /**
+         * Renders the question palette buttons based on the current test.
+         */
         function renderQuestionPalette() {
-             questionPalette.innerHTML = ''; // Clear previous palette
-             currentTestMCQs.forEach((_, i) => { // Iterate based on number of questions
+            // TODO: Clear existing palette buttons.
+            // Loop through currentTestMCQs.length.
+            // Create a button for each question number (1 to N).
+            // Set dataset.qindex = loop index.
+            // Add event listener (handlePaletteClick).
+            // Append button to questionPalette element.
+            // Call updatePaletteHighlight() after rendering.
+             questionPalette.innerHTML = ''; // Clear previous buttons
+             currentTestMCQs.forEach((_, i) => {
                  const button = document.createElement('button');
                  button.textContent = i + 1;
                  button.dataset.qindex = i;
@@ -933,208 +1159,1978 @@
                  button.addEventListener('click', handlePaletteClick);
                  questionPalette.appendChild(button);
              });
-             updatePaletteHighlight(); // Set initial styles for all buttons
+             updatePaletteHighlight(); // Set initial styles
         }
 
-         function updatePaletteButtonStatus(button, index) {
-             const answerState = userAnswers[index]; // { answerIndex, marked }
-             button.className = ''; // Reset classes
-             button.classList.add('palette-q-btn'); // Base class
-
-             if(answerState?.answerIndex !== null && answerState?.answerIndex !== undefined) {
-                 button.classList.add('answered');
-             }
-             if(answerState?.marked) {
-                 button.classList.add('marked');
-             }
-             if(index === currentQuestionIndex) {
-                 button.classList.add('current');
-             }
-         }
-
-         function updatePaletteHighlight() {
+        /**
+         * Updates the visual style (answered, marked, current) of all palette buttons.
+         */
+        function updatePaletteHighlight() {
+            // TODO: Loop through all buttons in questionPalette.
+            // Get the index from dataset.qindex.
+            // Check userAnswers[index] status (answered, marked).
+            // Check if index === currentQuestionIndex.
+            // Add/remove CSS classes ('answered', 'marked', 'current') accordingly.
              questionPalette.querySelectorAll('button').forEach(button => {
-                const index = parseInt(button.dataset.qindex, 10);
-                 if (!isNaN(index)) {
-                     updatePaletteButtonStatus(button, index);
+                 const index = parseInt(button.dataset.qindex, 10);
+                 if (!isNaN(index) && index < userAnswers.length) {
+                     const answerState = userAnswers[index];
+                     button.classList.remove('answered', 'marked', 'current'); // Reset
+
+                     if (answerState?.answerIndex !== null && answerState?.answerIndex !== undefined) {
+                         button.classList.add('answered');
+                     }
+                     if (answerState?.marked) {
+                         button.classList.add('marked');
+                     }
+                     if (index === currentQuestionIndex) {
+                         button.classList.add('current');
+                     }
                  }
              });
-         }
+        }
 
-         function handlePaletteClick(event) {
-              const index = parseInt(event.target.dataset.qindex, 10);
-              if (!isNaN(index) && index >= 0 && index < currentTestMCQs.length) {
-                  displayTestQuestion(index); // Navigate to the clicked question
-              }
-         }
+        /**
+         * Handles clicks on the question palette buttons.
+         * @param {Event} event The click event object.
+         */
+        function handlePaletteClick(event) {
+            // TODO: Get index from event.target.dataset.qindex.
+            // Call displayTestQuestion(index).
+             const button = event.target.closest('button');
+             if (button && button.dataset.qindex !== undefined) {
+                 const index = parseInt(button.dataset.qindex, 10);
+                 if (!isNaN(index)) {
+                     displayTestQuestion(index);
+                 }
+             }
+        }
 
-         function handleOptionSelect(optionIndex) {
-              if (userAnswers[currentQuestionIndex]) {
-                  userAnswers[currentQuestionIndex].answerIndex = optionIndex;
-              } else {
-                  userAnswers[currentQuestionIndex] = { answerIndex: optionIndex, marked: false };
-              }
-              console.log(`Q${currentQuestionIndex + 1} Answered: ${optionIndex}`);
-              updatePaletteHighlight(); // Update palette for the current question
-         }
-
-         function handleMarkReviewClick() {
-              if (userAnswers[currentQuestionIndex]) {
-                  userAnswers[currentQuestionIndex].marked = !userAnswers[currentQuestionIndex].marked;
-                  const isMarked = userAnswers[currentQuestionIndex].marked;
-                  markReviewBtn.textContent = isMarked ? 'Unmark Review' : 'Mark for Review';
-                  markReviewBtn.style.borderColor = isMarked ? 'var(--accent-color)' : ''; // Visual cue
-                  console.log(`Q${currentQuestionIndex + 1} Marked: ${isMarked}`);
-                  updatePaletteHighlight();
-              }
-         }
-
-         function handleClearResponseClick() {
+        /**
+         * Updates the user's answer state when a radio button is selected.
+         * @param {number} optionIndex The index of the selected option.
+         */
+        function handleOptionSelect(optionIndex) {
+            // TODO: Update userAnswers[currentQuestionIndex].answerIndex.
+            // Call updatePaletteHighlight().
              if (userAnswers[currentQuestionIndex]) {
-                 userAnswers[currentQuestionIndex].answerIndex = null; // Clear answer
-                 // Uncheck radio buttons visually
-                 const radioButtons = testOptionsContainer.querySelectorAll(`input[name="q_${currentQuestionIndex}"]`);
-                 radioButtons.forEach(rb => rb.checked = false);
-                 console.log(`Q${currentQuestionIndex + 1} Cleared`);
+                 userAnswers[currentQuestionIndex].answerIndex = optionIndex;
+             } else {
+                 // Should be initialized, but handle defensively
+                 userAnswers[currentQuestionIndex] = { answerIndex: optionIndex, marked: false };
+             }
+             console.log(`Q${currentQuestionIndex + 1} Answered: Option ${optionLetters[optionIndex] || optionIndex}`);
+             updatePaletteHighlight(); // Update the palette immediately
+        }
+
+        /**
+         * Toggles the 'marked for review' status for the current question.
+         */
+        function handleMarkReviewClick() {
+            // TODO: Toggle userAnswers[currentQuestionIndex].marked.
+            // Update markReviewBtn text ('Mark'/'Unmark').
+            // Call updatePaletteHighlight().
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].marked = !userAnswers[currentQuestionIndex].marked;
+                 const isMarked = userAnswers[currentQuestionIndex].marked;
+                 markReviewBtn.textContent = isMarked ? 'Unmark Review' : 'Mark for Review';
+                 markReviewBtn.style.borderColor = isMarked ? 'var(--accent-color)' : ''; // Optional visual cue
+                 console.log(`Q${currentQuestionIndex + 1} Marked for review: ${isMarked}`);
                  updatePaletteHighlight();
              }
-         }
+        }
 
+        /**
+         * Clears the selected answer for the current question.
+         */
+        function handleClearResponseClick() {
+            // TODO: Set userAnswers[currentQuestionIndex].answerIndex to null.
+            // Uncheck all radio buttons for the current question visually.
+            // Call updatePaletteHighlight().
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].answerIndex = null; // Clear the answer index
+                 // Uncheck radio buttons for this question
+                 const radioButtons = testOptionsContainer.querySelectorAll(`input[name="q_${currentQuestionIndex}"]`);
+                 radioButtons.forEach(rb => rb.checked = false);
+                 console.log(`Q${currentQuestionIndex + 1} Response Cleared`);
+                 updatePaletteHighlight(); // Update palette
+             }
+        }
+
+        /**
+         * Handles clicks on the Previous/Next navigation buttons.
+         * @param {'prev' | 'next'} direction The direction to navigate.
+         */
         function handleTestNavigation(direction) {
+            // TODO: Calculate newIndex based on direction and bounds.
+            // Call displayTestQuestion(newIndex).
              let newIndex = currentQuestionIndex;
-             if (direction === 'prev' && currentQuestionIndex > 0) newIndex--;
-             else if (direction === 'next' && currentQuestionIndex < currentTestMCQs.length - 1) newIndex++;
+             if (direction === 'prev' && currentQuestionIndex > 0) {
+                 newIndex--;
+             } else if (direction === 'next' && currentQuestionIndex < currentTestMCQs.length - 1) {
+                 newIndex++;
+             }
 
              if (newIndex !== currentQuestionIndex) {
                  displayTestQuestion(newIndex);
              }
-         }
+        }
 
+        /**
+         * Starts the test timer interval.
+         */
         function startTestTimer() {
-            if (testTimerInterval) clearInterval(testTimerInterval);
-            testStartTime = Date.now();
-            testTimer.textContent = `Time: 00:00`;
-            testTimerInterval = setInterval(() => {
+            // TODO: Clear any existing interval.
+            // Set testStartTime = Date.now().
+            // Start setInterval to update testTimer text content every second.
+             if (testTimerInterval) clearInterval(testTimerInterval); // Clear previous timer
+             testStartTime = Date.now();
+             testTimer.textContent = `Time: 00:00`; // Reset display
+             console.log("Test timer started.");
+
+             testTimerInterval = setInterval(() => {
                  const elapsedSeconds = Math.floor((Date.now() - testStartTime) / 1000);
                  const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
                  const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
                  testTimer.textContent = `Time: ${minutes}:${seconds}`;
-            }, 1000);
-         }
+             }, 1000); // Update every second
+        }
 
-         function submitTest() {
-             if (!confirm("Are you sure you want to submit the test?")) return;
+        /**
+         * Handles the submission of the test.
+         */
+        function submitTest() {
+            // TODO: Confirm submission with the user.
+            // Stop the timer (clearInterval).
+            // Calculate results using calculateResults().
+            // Store results in reviewResultsCache.
+            // Call displayReview().
+            // Call showView('review-view').
+             // Optional: Check for unanswered questions
+             const unansweredCount = userAnswers.filter(a => a.answerIndex === null).length;
+             let confirmationMessage = "Are you sure you want to submit the test?";
+             if (unansweredCount > 0) {
+                 confirmationMessage += `\n\nYou have ${unansweredCount} unanswered question(s).`;
+             }
 
-             if (testTimerInterval) clearInterval(testTimerInterval); // Stop timer
-             const endTime = Date.now();
-             const timeTakenMs = testStartTime ? endTime - testStartTime : 0;
+             if (confirm(confirmationMessage)) {
+                 console.log("Submitting test...");
+                 if (testTimerInterval) clearInterval(testTimerInterval); // Stop the timer
+                 const endTime = Date.now();
+                 const timeTakenMs = testStartTime ? endTime - testStartTime : 0;
 
-             // Calculate results
-             reviewResultsCache = calculateResults(currentTestMCQs, userAnswers, timeTakenMs);
+                 // Calculate results
+                 reviewResultsCache = calculateResults(currentTestMCQs, userAnswers, timeTakenMs);
+                 console.log("Test results calculated:", reviewResultsCache);
 
-             // Show review view
-             displayReview(reviewResultsCache);
-             showView('review-view');
-         }
+                 // Display review
+                 displayReview(reviewResultsCache);
+                 showView('review-view');
+             } else {
+                 console.log("Test submission cancelled.");
+             }
+        }
 
-         function calculateResults(mcqs, answersState, timeMs) {
-             // (Calculation logic here - same as previous response)
-            let correctCount = 0, incorrectCount = 0, skippedCount = 0;
-            const reviewQuestions = [];
-            mcqs.forEach((q, idx) => {
-                const uAnswerState = answersState[idx]; // { answerIndex: null/0/1.., marked: false }
-                const uAIdx = uAnswerState?.answerIndex;
-                const opts = q.options || [];
-                const cALtr = q.answer?.trim().toUpperCase();
-                const cAIdx = cALtr ? cALtr.charCodeAt(0) - 'A'.charCodeAt(0) : -1;
-                const cATxtE = (cAIdx >= 0 && cAIdx < opts.length) ? (opts[cAIdx]?.en || '?') : "N/A";
-                let uATxtE = "Skipped"; let st = "skipped";
-                if (uAIdx !== null && uAIdx !== undefined && uAIdx >= 0 && uAIdx < opts.length) {
-                    uATxtE = opts[uAIdx]?.en || '?';
-                    if (uAIdx === cAIdx) { st = "correct"; correctCount++; }
-                    else { st = "incorrect"; incorrectCount++; }
-                } else if (uAIdx !== null && uAIdx !== undefined) { uATxtE = "Invalid"; st = "incorrect"; incorrectCount++; }
-                else { skippedCount++; }
-                reviewQuestions.push({ question: q.question?.en || '?', correctAnswer: cATxtE, userAnswer: uATxtE, status: st, explanation: q.explanation?.en || "N/A", markedForReview: uAnswerState?.marked || false });
-            });
-            const total = mcqs.length; const score = `${correctCount}/${total}`; const timeS = Math.round(timeMs / 1000); const mins = Math.floor(timeS / 60); const secs = timeS % 60; const timeStr = `${mins}m ${secs}s`;
-            return { questions: reviewQuestions, summary: { score, correct: correctCount, incorrect: incorrectCount, skipped: skippedCount, timeString: timeStr }, testDate: new Date().toISOString(), timeTakenMs: timeMs, testTitle: testTitle.textContent, originalMCQs: mcqs };
-         }
+        /**
+         * Calculates the test results based on answers provided.
+         * @param {Array} mcqs The array of original MCQ objects.
+         * @param {Array} answersState The array of user answer state objects.
+         * @param {number} timeMs The total time taken in milliseconds.
+         * @returns {object} An object containing the review questions and summary.
+         */
+        function calculateResults(mcqs, answersState, timeMs) {
+            // TODO: Implement result calculation logic as described previously.
+            // Compare userAnswers[i].answerIndex with mcqs[i].answer.
+            // Count correct, incorrect, skipped.
+            // Format reviewQuestions array.
+            // Return the results object.
+             console.log("Calculating results...");
+             let correctCount = 0, incorrectCount = 0, skippedCount = 0;
+             const reviewQuestions = []; // For display in review view
+
+             mcqs.forEach((q, idx) => {
+                 const uAnswerState = answersState[idx]; // { answerIndex: null/0/1.., marked: false }
+                 const uAIdx = uAnswerState?.answerIndex;
+
+                 const opts = q.options || [];
+                 const cALtr = q.answer?.trim().toUpperCase(); // Correct answer letter (A, B, C, D)
+                 // Convert correct answer letter to index (0, 1, 2, 3)
+                 const cAIdx = cALtr ? cALtr.charCodeAt(0) - 'A'.charCodeAt(0) : -1;
+                 // Get correct answer text (defaulting to English)
+                 const cATxtE = (cAIdx >= 0 && cAIdx < opts.length) ? (opts[cAIdx]?.en || '?') : "N/A";
+
+                 let uATxtE = "Skipped"; // User's answer text (defaulting to English)
+                 let st = "skipped"; // Status: correct, incorrect, skipped
+
+                 if (uAIdx !== null && uAIdx !== undefined) { // If an answer was selected
+                     if (uAIdx >= 0 && uAIdx < opts.length) { // Check if index is valid
+                         uATxtE = opts[uAIdx]?.en || '?'; // Get user's selected option text
+                         if (uAIdx === cAIdx) {
+                             st = "correct"; correctCount++;
+                         } else {
+                             st = "incorrect"; incorrectCount++;
+                         }
+                     } else { // Should not happen with radio buttons, but handle defensively
+                         uATxtE = "Invalid Option"; st = "incorrect"; incorrectCount++;
+                     }
+                 } else { // No answer selected (index is null/undefined)
+                     skippedCount++;
+                 }
+
+                 // Add details for the review screen
+                 reviewQuestions.push({
+                     question: q.question?.en || '?', // Defaulting to English
+                     correctAnswer: cATxtE,
+                     userAnswer: uATxtE,
+                     status: st,
+                     explanation: q.explanation?.en || "No explanation provided.", // Defaulting to English
+                     markedForReview: uAnswerState?.marked || false // Include marked status
+                 });
+             });
+
+             const total = mcqs.length;
+             const score = `${correctCount}/${total}`;
+             const timeS = Math.round(timeMs / 1000);
+             const mins = Math.floor(timeS / 60);
+             const secs = timeS % 60;
+             const timeStr = `${mins}m ${secs}s`;
+
+             // Return the structured results
+             return {
+                 questions: reviewQuestions, // Detailed results per question
+                 summary: { score, correct: correctCount, incorrect: incorrectCount, skipped: skippedCount, timeString: timeStr },
+                 testDate: new Date().toISOString(),
+                 timeTakenMs: timeMs,
+                 testTitle: testTitle.textContent, // Get title from the test view header during submission
+                 originalMCQs: mcqs // Include original MCQs for potential reattempt
+             };
+        }
+
 
         // --- Review Functions ---
+
+        /**
+         * Displays the calculated test review results.
+         * @param {object} reviewData The results object from calculateResults.
+         */
         function displayReview(reviewData) {
-             // (Display logic using reviewData - same as previous response)
-             reviewContent.innerHTML = ''; reviewSummary.innerHTML = ''; reviewFilters.style.display = 'none';
-             if (!reviewData?.questions?.length || !reviewData.summary) { reviewSummary.innerHTML = "<span>No review data available.</span>"; return; }
+            // TODO: Implement review display logic as described previously.
+            // Update reviewTitle, reviewSummary.
+            // Clear and populate reviewContent with review items.
+            // Show/hide reviewFilters based on results.
+            // Typeset MathJax if needed.
+             console.log("Displaying review...");
+             reviewContent.innerHTML = ''; // Clear previous review
+             reviewSummary.innerHTML = ''; // Clear previous summary
+             reviewFilters.style.display = 'none'; // Hide filters initially
+
+             if (!reviewData?.questions?.length || !reviewData.summary) {
+                 reviewSummary.innerHTML = "<span>Review data is unavailable.</span>";
+                 console.warn("displayReview called with invalid data.");
+                 return;
+             }
+
+             // Display Summary
              const { score, correct, incorrect, skipped, timeString } = reviewData.summary;
              reviewSummary.innerHTML = `<span>Score: ${score}</span> | <span class="score-correct">Correct: ${correct}</span> | <span class="score-incorrect">Incorrect: ${incorrect}</span> | <span class="score-skipped">Skipped: ${skipped}</span> | <span>Time: ${timeString}</span>`;
-             reviewTitle.textContent = reviewData.testTitle || "Test Review";
+             reviewTitle.textContent = reviewData.testTitle || "Test Review"; // Use title from results
+
+             // Display Individual Question Reviews
              reviewData.questions.forEach((qSum, idx) => {
                  const rItem = document.createElement('div');
-                 rItem.className = 'review-item'; rItem.dataset.status = qSum.status;
-                 let answerHtml = ''; const userAnsClass = `user-answer-${qSum.status}`;
-                 answerHtml += `<span class="${userAnsClass}">Your Answer: ${qSum.userAnswer} ${qSum.markedForReview ? '(Marked)' : ''}</span>`;
-                 if (qSum.status !== 'correct') { answerHtml += `<br><span class="correct-answer">Correct Answer: ${qSum.correctAnswer}</span>`; }
-                 rItem.innerHTML = `<div class="review-item-qnum">Q ${idx + 1}</div> <div class="review-item-question">${qSum.question}</div> <div class="review-item-details">${answerHtml}<div class="review-item-explanation">Explanation: ${qSum.explanation}</div></div>`;
+                 rItem.className = 'review-item';
+                 rItem.dataset.status = qSum.status; // Set status for filtering
+
+                 let answerHtml = '';
+                 const userAnsClass = `user-answer-${qSum.status}`;
+                 // Display user answer (and if it was marked)
+                 answerHtml += `<span class="${userAnsClass}">Your Answer: ${qSum.userAnswer} ${qSum.markedForReview ? '<span style="font-size:0.8em; color:var(--accent-color);">(Marked)</span>' : ''}</span>`;
+
+                 // Display correct answer only if user was wrong or skipped
+                 if (qSum.status !== 'correct') {
+                     answerHtml += `<br><span class="correct-answer">Correct Answer: ${qSum.correctAnswer}</span>`;
+                 }
+
+                 // Construct the review item HTML
+                 rItem.innerHTML = `
+                     <div class="review-item-qnum">Question ${idx + 1}</div>
+                     <div class="review-item-question">${qSum.question}</div>
+                     <div class="review-item-details">
+                         ${answerHtml}
+                         <div class="review-item-explanation">Explanation: ${qSum.explanation}</div>
+                     </div>
+                 `;
                  reviewContent.appendChild(rItem);
              });
+
+             // Show/Hide Filters
              if (incorrect > 0 || skipped > 0) {
-                 reviewFilters.style.display = 'block'; filterReviewItems('all');
-                 reviewFilters.querySelectorAll('button').forEach(btn => { btn.classList.toggle('active-filter', btn.dataset.filter === 'all'); });
-             } else { reviewFilters.style.display = 'none'; }
-             // Typeset MathJax
-             if (typeof MathJax !== "undefined" && MathJax.typesetPromise) { setTimeout(() => { MathJax.typesetPromise([reviewContent]).catch(err=>console.error('MathJax Review Error:', err)); }, 50); }
-         }
+                 reviewFilters.style.display = 'block';
+                 // Ensure 'All' filter is active by default
+                 filterReviewItems('all');
+                 reviewFilters.querySelectorAll('button').forEach(btn => {
+                     btn.classList.toggle('active-filter', btn.dataset.filter === 'all');
+                 });
+             } else {
+                 reviewFilters.style.display = 'none';
+             }
 
-         function filterReviewItems(filter) {
-             // (Filter logic - same as previous response)
-            reviewFilters.querySelectorAll('button').forEach(btn => { btn.classList.toggle('active-filter', btn.dataset.filter === filter); });
-            reviewContent.querySelectorAll('.review-item').forEach(item => {
-                 const show = (filter === 'all') || item.dataset.status === filter;
-                 item.style.display = show ? 'block' : 'none';
-            });
-         }
+             // Typeset MathJax for the review content
+             if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+                 setTimeout(() => { // Delay ensures DOM is ready
+                      MathJax.typesetPromise([reviewContent])
+                            .catch(err => console.error('MathJax Review typesetting error:', err));
+                 }, 50);
+             }
+        }
 
-         function exitReview() {
-             // (Return to correct dashboard logic - same as previous response)
-             reviewResultsCache = null;
-             if (isAdmin) { showView('admin-dashboard-view'); }
-             else { showView('user-dashboard-view'); }
-         }
+        /**
+         * Filters the displayed review items based on status (all, incorrect, skipped).
+         * @param {'all' | 'incorrect' | 'skipped'} filter The filter criteria.
+         */
+        function filterReviewItems(filter) {
+            // TODO: Implement filter logic as described previously.
+            // Update 'active-filter' class on buttons.
+            // Show/hide '.review-item' elements based on dataset.status.
+             console.log(`Filtering review items by: ${filter}`);
+             // Update button styles
+             reviewFilters.querySelectorAll('button').forEach(btn => {
+                 btn.classList.toggle('active-filter', btn.dataset.filter === filter);
+             });
+             // Show/hide review items
+             reviewContent.querySelectorAll('.review-item').forEach(item => {
+                  const show = (filter === 'all') || item.dataset.status === filter;
+                  item.style.display = show ? 'block' : 'none'; // Toggle display
+             });
+        }
+
+        /**
+         * Handles the click on the "Back to Dashboard" button in the review view.
+         */
+        function exitReview() {
+            // TODO: Clear reviewResultsCache.
+            // Call showView() to navigate back to the appropriate dashboard (admin or user).
+             console.log("Exiting review...");
+             reviewResultsCache = null; // Clear the cached results
+             // Navigate back based on user role
+             if (isAdmin) {
+                 showView('admin-dashboard-view');
+                 // Optionally reload admin tests if needed, though usually not necessary
+                 // loadAdminTests(currentUser.uid);
+             } else {
+                 showView('user-dashboard-view');
+                 // Optionally reload public tests if needed
+                 // loadPublicTests();
+             }
+        }
+
 
         // --- Event Listeners ---
         console.log("Adding event listeners...");
+        // Authentication
         loginBtn.addEventListener('click', signInWithGoogle);
         adminLogoutBtn.addEventListener('click', signOut);
         userLogoutBtn.addEventListener('click', signOut);
+
+        // Test Navigation
         prevQuestionBtn.addEventListener('click', () => handleTestNavigation('prev'));
         nextQuestionBtn.addEventListener('click', () => handleTestNavigation('next'));
         submitTestBtn.addEventListener('click', submitTest);
-        exitReviewBtn.addEventListener('click', exitReview);
-        reviewFilters.addEventListener('click', (event) => { const button = event.target.closest('button[data-filter]'); if (button) filterReviewItems(button.dataset.filter); });
+
+        // Test Actions
         markReviewBtn.addEventListener('click', handleMarkReviewClick);
         clearResponseBtn.addEventListener('click', handleClearResponseClick);
-        // Add delegated listeners if needed for dynamic content (like test lists)
-        // Example for user test list start button:
-         userTestListContainer.addEventListener('click', (event) => {
-             const startButton = event.target.closest('.start-test-btn');
-             if (startButton) {
-                 handleStartTestClick(event); // Pass the event or extract ID
-             }
-         });
-        // Example for admin list delete button / toggle (if not handled directly on creation):
+        questionPalette.addEventListener('click', handlePaletteClick); // Use delegation
+
+        // Review View
+        exitReviewBtn.addEventListener('click', exitReview);
+        reviewFilters.addEventListener('click', (event) => { // Use delegation
+            const button = event.target.closest('button[data-filter]');
+            if (button) filterReviewItems(button.dataset.filter);
+        });
+
+        // Dashboard List Actions (Delegated)
+        userTestListContainer.addEventListener('click', (event) => {
+            const startButton = event.target.closest('.start-test-btn');
+            if (startButton) handleStartTestClick(event);
+        });
         adminTestListContainer.addEventListener('click', (event) => {
             const deleteButton = event.target.closest('.admin-delete-btn');
-            const toggleInput = event.target.closest('.public-toggle-switch');
+            // Toggle is handled by direct listener in createAdminTestListItem
+            if (deleteButton) handleDeleteTestClick(event);
+        });
 
-            if (deleteButton) {
-                 handleDeleteTestClick(event); // Make sure function handles event obj
+        console.log("Event listeners added.");
+        // --- End of JavaScript Skeleton ---
+
+    </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Test Portal (Admin & User)</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script> window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }, svg: { fontCache: 'global' }, options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] } }; </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script type="module"> try { const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = await import("https://esm.run/@google/generative-ai"); window.GoogleGenerativeAI = GoogleGenerativeAI; window.HarmCategory = HarmCategory; window.HarmBlockThreshold = HarmBlockThreshold; console.log("GoogleGenerativeAI SDK loaded."); window.dispatchEvent(new Event('google-ai-sdk-loaded')); } catch (error) { console.error("Failed to load GoogleGenerativeAI SDK:", error); window.googleAiSdkLoadError = error; } </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" /> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/toolbar/prism-toolbar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"></script>
+
+
+    <style>
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-color: #4a90e2; /* Example Blue */
+            --secondary-color: #50e3c2; /* Example Teal */
+            --accent-color: #f5a623; /* Example Orange */
+            --danger-color: #d0021b; /* Example Red */
+            --success-color: #7ed321; /* Example Green */
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529; /* For potential dark theme */
+            --light-text: #212529;
+            --dark-text: #f8f9fa; /* For potential dark theme */
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 3px 8px rgba(0,0,0,0.1);
+            --font-family: 'Poppins', sans-serif;
+            --border-radius: 8px;
+        }
+
+        /* Basic Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            line-height: 1.6;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items to the top */
+            min-height: 100vh;
+        }
+
+        #app-root {
+            width: 100%;
+            max-width: 1200px; /* Limit max width */
+            background-color: #fff;
+            box-shadow: var(--shadow-md);
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .view-container {
+            display: none; /* Hide all views by default */
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 30px 5%;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .view-container.active-view {
+            display: flex; /* Show only the active view */
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Loading Overlay --- */
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 1000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            color: var(--primary-color); text-align: center;
+            transition: opacity 0.3s ease; /* Smooth fade */
+        }
+        #loading-overlay p { margin-top: 15px; font-size: 1.1em; font-weight: 500; }
+        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--primary-color); animation: spin 1s ease infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- Buttons --- */
+        button {
+            padding: 10px 20px; cursor: pointer; border-radius: var(--border-radius);
+            border: none; font-size: 1em; font-weight: 500;
+            background-color: var(--primary-color); color: white;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        button:hover:not(:disabled) { background-color: #357abd; box-shadow: var(--shadow-md); transform: translateY(-1px);}
+        button:active:not(:disabled) { transform: translateY(0px); box-shadow: var(--shadow-sm); }
+        button:disabled { background-color: #cccccc; color: #666666; cursor: not-allowed; box-shadow: none; opacity: 0.7;}
+        button.secondary { background-color: #6c757d; }
+        button.secondary:hover:not(:disabled) { background-color: #5a6268; }
+        button.danger { background-color: var(--danger-color); }
+        button.danger:hover:not(:disabled) { background-color: #a80115; }
+
+        /* --- Login View --- */
+        #login-view {
+            min-height: 400px;
+            justify-content: center; align-items: center; text-align: center;
+        }
+        #login-view h2 { margin-bottom: 1rem; font-size: 1.8em;}
+        #login-view p { margin-bottom: 2rem; color: #6c757d; }
+        #login-google-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background-color: #fff; color: #444;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 12px 25px; font-size: 1.05em;
+        }
+         #login-google-btn svg { margin-right: 8px; }
+        #login-google-btn:hover:not(:disabled) { background-color: #f8f8f8; box-shadow: var(--shadow-md); }
+
+        /* --- Dashboard Styles --- */
+        .dashboard-header {
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px;
+        }
+         .dashboard-header h2 { margin-bottom: 0; }
+        .user-info span { margin-right: 15px; font-weight: 500; color: #495057; }
+        .test-list-container { display: grid; gap: 25px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+
+        .test-card {
+            background-color: var(--card-bg); border-radius: var(--border-radius);
+            border: 1px solid var(--border-color); padding: 20px 25px;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        .test-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+        .test-card .test-title { font-size: 1.15em; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; }
+        .test-card .test-details { font-size: 0.9em; color: #6c757d; margin-bottom: 20px; }
+        .test-card .actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; padding-top: 15px; border-top: 1px solid #f1f1f1; }
+
+        /* Admin Specific Card Styles */
+        .admin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .public-status-label { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+        .public-status { font-size: 0.9em; font-weight: 500; padding: 4px 10px; border-radius: 15px; }
+        .public-status.public { color: #1b6a2f; background-color: #d1f7c4; border: 1px solid #a3e9a4; }
+        .public-status.private { color: #5a6268; background-color: #e9ecef; border: 1px solid #ced4da; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:focus + .slider { box-shadow: 0 0 1px var(--success-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* --- Mock Test View --- */
+        #mock-test-view .test-header { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        #mock-test-view .test-info { display: flex; gap: 20px; font-weight: 500; }
+        #mock-test-view .test-body { display: flex; flex-direction: column; gap: 30px; flex-grow: 1; }
+        .question-area { flex-grow: 1; }
+        .palette-area { flex-shrink: 0; background-color: #fdfdff; padding: 20px; border-radius: var(--border-radius); border: 1px solid var(--border-color); box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
+        .palette-area h4 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+        #question-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 8px; margin-bottom: 20px; }
+        #question-palette button { width: 38px; height: 38px; text-align: center; padding: 0; line-height: 36px; border: 1px solid var(--border-color); background-color: #fff; cursor: pointer; border-radius: 50%; font-weight: 500; transition: all 0.2s ease; }
+        #question-palette button:hover { background-color: #e9ecef; border-color: #adb5bd; }
+        #question-palette button.answered { background-color: var(--success-color); color: white; border-color: var(--success-color); }
+        #question-palette button.marked { border: 2px solid var(--accent-color); line-height: 32px; /* Adjust for border */ }
+        #question-palette button.current { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 600; transform: scale(1.1); box-shadow: var(--shadow-md); }
+        .palette-legend { font-size: 0.85em; color: #6c757d; margin-top: 10px; }
+        .palette-legend p { margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .legend-color { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
+        .test-question-number { font-weight: 600; color: #6c757d; margin-bottom: 10px; }
+        .test-question { font-size: 1.15em; margin-bottom: 25px; line-height: 1.7; }
+        .test-options label { display: block; margin-bottom: 12px; padding: 15px 20px; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; transition: background-color 0.2s ease, border-color 0.2s ease; background-color: var(--card-bg); position: relative; padding-left: 45px; } /* Adjusted padding */
+        .test-options label:hover { background-color: #eef5ff; border-color: var(--primary-color); }
+        .test-options input[type="radio"] { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;} /* Hide default */
+        .test-options label .option-text { /* Wrap text in a span */ display: block; }
+        .test-options label .radio-custom { /* Custom radio button */ position: absolute; top: 50%; left: 15px; height: 20px; width: 20px; background-color: #fff; border: 2px solid var(--border-color); border-radius: 50%; transform: translateY(-50%); transition: border-color 0.2s ease; }
+        .test-options label:hover .radio-custom { border-color: var(--primary-color); }
+        .test-options input[type="radio"]:checked ~ .radio-custom { background-color: #fff; border-color: var(--primary-color); }
+        .test-options .radio-custom::after { /* Inner dot */ content: ""; position: absolute; display: none; top: 50%; left: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); transform: translate(-50%, -50%); }
+        .test-options input[type="radio"]:checked ~ .radio-custom::after { display: block; }
+        .test-options input[type="radio"]:checked ~ .option-text { /* Style checked text */ font-weight: 600; color: var(--primary-color); }
+
+        .test-actions { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 15px; }
+        .test-actions button { font-size: 0.9em; padding: 8px 15px; }
+        .test-navigation { padding-top: 25px; margin-top: auto; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        #submit-test-btn { background-color: var(--danger-color); }
+        #submit-test-btn:hover:not(:disabled) { background-color: #a80115; }
+
+        /* --- Review View --- */
+        .review-summary { margin-bottom: 20px; padding: 15px; background-color: var(--light-bg); border-radius: var(--border-radius); border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-around; }
+        .review-summary span { font-weight: 500; font-size: 1.05em;}
+        .score-correct { color: #28a745; }
+        .score-incorrect { color: #dc3545; }
+        .score-skipped { color: #fd7e14; }
+        .review-filters { margin-bottom: 20px; }
+        .review-filters button { background-color: #e9ecef; color: #495057; margin-right: 8px; padding: 6px 12px; font-size: 0.9em; border: 1px solid #ced4da; }
+        .review-filters button.active-filter { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .review-item { background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow-sm); }
+        .review-item-qnum { font-weight: 600; color: var(--primary-color); margin-bottom: 8px; }
+        .review-item-question { margin-bottom: 15px; font-weight: 500; line-height: 1.7; }
+        .review-item-details { font-size: 0.95em; line-height: 1.8; }
+        .review-item-details > span { display: block; margin-bottom: 8px; padding: 8px 12px; border-radius: 4px; border: 1px solid transparent; } /* Added border for consistency */
+        .user-answer-correct { background-color: #e4f8d1; color: #1b6a2f; border-color: #a3e9a4; }
+        .user-answer-incorrect { background-color: #fbeaea; color: #dc3545; border-color: #f5c6cb; text-decoration: line-through; }
+        .user-answer-skipped { background-color: #fff3e0; color: #fd7e14; border-color: #ffeeba; font-style: italic; }
+        .correct-answer { font-weight: bold; color: #28a745; background-color: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+        .review-item-explanation { margin-top: 12px; padding: 12px 15px; background-color: #f8f9fa; border-left: 4px solid var(--secondary-color); border-radius: 0 4px 4px 0; font-size: 0.9em; color: #495057; }
+        .review-footer { text-align: center; margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+
+        /* --- Responsive Design --- */
+        @media (min-width: 992px) { /* Large screens */
+            #mock-test-view .test-body { flex-direction: row; }
+            .palette-area { width: 280px; }
+        }
+        @media (max-width: 767px) { /* Small screens */
+            body { font-size: 15px; }
+            #app-root { margin: 0; border-radius: 0; box-shadow: none; }
+            .view-container { padding: 20px; }
+            h2 { font-size: 1.5em; } h3 { font-size: 1.2em; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .test-list-container { grid-template-columns: 1fr; gap: 15px; }
+            .test-card .actions { flex-direction: column; align-items: flex-start; gap: 12px;}
+            #mock-test-view .test-body { flex-direction: column; gap: 20px;}
+            .palette-area { width: auto; border-left: none; border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 15px; padding-left: 0; }
+            #question-palette { grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 6px;}
+            #question-palette button { width: 35px; height: 35px; line-height: 33px;}
+            #question-palette button.marked { line-height: 29px;}
+            .test-navigation { flex-direction: column; gap: 10px; }
+            .test-navigation button { width: 100%; }
+            .review-summary { flex-direction: column; gap: 8px; align-items: flex-start; }
+            .review-summary span { font-size: 1em;}
+            .review-filters { display: flex; flex-wrap: wrap; gap: 8px;}
+        }
+
+        /* Utility Classes */
+        .error-message {
+            color: var(--danger-color);
+            background-color: #fbeaea;
+            border: 1px solid #f5c6cb;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p id="loading-message">Loading...</p>
+    </div>
+
+    <div id="app-root">
+
+        <div id="login-view" class="view-container active-view"> <h2>Modern Test Portal</h2>
+            <p>Log in with Google to access tests or manage your portal.</p>
+            <button id="login-google-btn">
+                 <svg aria-hidden="true" height="18" width="18" viewBox="0 0 18 18" style="vertical-align: middle;"><path d="M16.51 8.1H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z" fill="#4285F4"></path><path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z" fill="#34A853"></path><path d="M4.5 10.52a4.8 4.8 0 010-3.04V5.41H1.83a8 8 0 000 7.18l2.67-2.07z" fill="#FBBC05"></path><path d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 001.83 5.4L4.5 7.49a4.77 4.77 0 014.48-3.3z" fill="#EA4335"></path></svg>
+                 <span style="vertical-align: middle; margin-left: 10px;">Login with Google</span>
+            </button>
+            <div id="login-error" class="error-message" style="display: none; margin-top: 15px;"></div>
+        </div>
+
+        <div id="admin-dashboard-view" class="view-container">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <div class="user-info">
+                    <span id="admin-user-email">email@example.com</span>
+                    <button id="admin-logout-btn" class="secondary">Logout</button>
+                </div>
+            </div>
+            <h3>Manage Tests</h3>
+            <div id="admin-test-list" class="test-list-container">
+                <p>Loading your tests...</p>
+            </div>
+        </div>
+
+        <div id="user-dashboard-view" class="view-container">
+             <div class="dashboard-header">
+                <h2>Available Tests</h2>
+                 <div class="user-info">
+                    <span id="user-user-email">email@example.com</span>
+                    <button id="user-logout-btn" class="secondary">Logout</button>
+                </div>
+            </div>
+            <div id="user-test-list" class="test-list-container">
+                <p>Loading available tests...</p>
+                 <div id="user-test-list-error" class="error-message" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div id="mock-test-view" class="view-container">
+            <div class="test-header">
+                <h2 id="test-title">Mock Test</h2>
+                <div class="test-info">
+                    <span id="question-counter">Q: 1 / N</span>
+                    <span id="test-timer">Time: 00:00</span>
+                </div>
+            </div>
+            <div class="test-body">
+                <div class="question-area">
+                    <div class="test-question-container">
+                        <div class="test-question-number" id="test-question-number">Question 1</div>
+                        <div class="test-question" id="test-question">Loading question...</div>
+                        <div class="test-options" id="test-options">
+                            </div>
+                    </div>
+                    <div class="test-actions">
+                        <button id="mark-review-btn" class="secondary">Mark for Review</button>
+                        <button id="clear-response-btn" class="secondary">Clear Response</button>
+                    </div>
+                </div>
+                <div class="palette-area">
+                    <h4>Question Palette</h4>
+                    <div id="question-palette">
+                        </div>
+                    <div class="palette-legend">
+                        <p><span class="legend-color" style="background-color: var(--success-color);"></span> Answered</p>
+                        <p><span class="legend-color" style="border: 2px solid var(--accent-color); background-color: #fff;"></span> Marked</p>
+                        <p><span class="legend-color" style="background-color: #fff; border: 1px solid #ccc;"></span> Not Answered</p>
+                        <p><span class="legend-color" style="background-color: var(--primary-color);"></span> Current</p>
+                    </div>
+                </div>
+            </div>
+            <div class="test-navigation">
+                <button id="prev-question-btn" class="secondary" disabled>Previous</button>
+                <button id="next-question-btn" class="secondary">Next</button>
+                <button id="submit-test-btn">Submit Test</button>
+            </div>
+        </div>
+
+        <div id="review-view" class="view-container">
+             <div class="review-header">
+                 <h2 id="review-title">Test Review</h2>
+                 <div class="review-summary" id="review-summary">Loading summary...</div>
+                 <div class="review-filters" id="review-filters" style="display: none;">
+                     Filter:
+                     <button data-filter="all" class="active-filter">All</button>
+                     <button data-filter="incorrect">Incorrect</button>
+                     <button data-filter="skipped">Skipped</button>
+                 </div>
+             </div>
+             <div class="review-content" id="review-content">
+                 <p>Loading review...</p>
+             </div>
+             <div class="review-footer">
+                 <button id="exit-review-btn" class="secondary">Back to Dashboard</button>
+                 </div>
+         </div>
+
+    </div> <script>
+        // --- Firebase Config ---
+        // Using the config you provided. Ensure this is 100% correct for your project.
+        const firebaseConfig = {
+          apiKey: "AIzaSyDgw604fe5jnNu4kTOv1cQ-3n7PL8gcN58",
+          authDomain: "krish-c5db8.firebaseapp.com",
+          projectId: "krish-c5db8",
+          storageBucket: "krish-c5db8.firebasestorage.app", // Make sure this is correct (.appspot.com or .firebasestorage.app)
+          messagingSenderId: "217175257890",
+          appId: "1:217175257890:web:209f0f290eabab6b1fab7b",
+          measurementId: "G-97SHYGL2J4"
+        };
+
+        // --- Initialize Firebase ---
+        let fbApp; // Keep a reference if needed
+        let fbAuth;
+        let db;
+        try {
+            console.log("Initializing Firebase...");
+            fbApp = firebase.initializeApp(firebaseConfig);
+            fbAuth = firebase.auth();
+            db = firebase.firestore();
+            console.log("Firebase Initialized successfully.");
+        } catch (error) {
+            console.error("CRITICAL: Firebase initialization failed!", error);
+            // Display a critical error message to the user, as the app cannot function.
+            const loginErrorDiv = document.getElementById('login-error');
+            if(loginErrorDiv) {
+                loginErrorDiv.textContent = `Firebase initialization failed: ${error.message}. Please check console and config.`;
+                loginErrorDiv.style.display = 'block';
             }
-            // Toggle change is already handled by direct listener added in createAdminTestListItem
-            // if (toggleInput) { handlePublicToggleChange(event); }
-         });
+            // Hide loading overlay if it was shown
+            const loadingOverlayInitial = document.getElementById('loading-overlay');
+            if(loadingOverlayInitial) loadingOverlayInitial.style.display = 'none';
+        }
 
-        console.log("Initial script execution finished.");
+
+        // --- DOM Elements ---
+        console.log("Getting DOM Elements...");
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        const appRoot = document.getElementById('app-root');
+        const loginView = document.getElementById('login-view');
+        const adminDashboardView = document.getElementById('admin-dashboard-view');
+        const userDashboardView = document.getElementById('user-dashboard-view');
+        const mockTestView = document.getElementById('mock-test-view');
+        const reviewView = document.getElementById('review-view');
+        const loginBtn = document.getElementById('login-google-btn');
+        const adminLogoutBtn = document.getElementById('admin-logout-btn');
+        const userLogoutBtn = document.getElementById('user-logout-btn');
+        const adminUserEmail = document.getElementById('admin-user-email');
+        const userUserEmail = document.getElementById('user-user-email');
+        const adminTestListContainer = document.getElementById('admin-test-list');
+        const userTestListContainer = document.getElementById('user-test-list');
+        const userTestListError = document.getElementById('user-test-list-error'); // Error message div for user dashboard
+        const loginError = document.getElementById('login-error'); // Error message div for login
+        // Test View Elements
+        const testTitle = document.getElementById('test-title');
+        const questionCounter = document.getElementById('question-counter');
+        const testTimer = document.getElementById('test-timer');
+        const testQuestionNumber = document.getElementById('test-question-number');
+        const testQuestion = document.getElementById('test-question');
+        const testOptionsContainer = document.getElementById('test-options');
+        const questionPalette = document.getElementById('question-palette');
+        const markReviewBtn = document.getElementById('mark-review-btn');
+        const clearResponseBtn = document.getElementById('clear-response-btn');
+        const prevQuestionBtn = document.getElementById('prev-question-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const submitTestBtn = document.getElementById('submit-test-btn');
+        // Review View Elements
+        const reviewTitle = document.getElementById('review-title');
+        const reviewSummary = document.getElementById('review-summary');
+        const reviewFilters = document.getElementById('review-filters');
+        const reviewContent = document.getElementById('review-content');
+        const exitReviewBtn = document.getElementById('exit-review-btn');
+        console.log("DOM Elements obtained.");
+
+
+        // --- State Variables ---
+        let currentUser = null;
+        let isAdmin = false;
+        let currentView = 'login'; // Tracks the currently active view ID
+        let isAISdkReady = false; // AI SDK specific state - currently unused in this skeleton
+        let genAI = null; // AI SDK instance - currently unused in this skeleton
+        let HarmCategory = null; // AI SDK Harm Categories - currently unused
+        let HarmBlockThreshold = null; // AI SDK Harm Thresholds - currently unused
+        // Test State
+        let currentTestMCQs = []; // Holds the questions for the active test
+        let currentQuestionIndex = 0; // Index of the currently displayed question
+        let userAnswers = []; // Array of objects: { answerIndex: null/0/1.., marked: false }
+        let testStartTime = null; // Timestamp when the test started
+        let testTimerInterval = null; // Interval ID for the test timer
+        let reviewResultsCache = null; // To hold results after test submission for review display
+
+        // --- Initialization ---
+        // Check if Firebase initialized correctly before proceeding
+        if (fbAuth) {
+            initializeApp();
+        }
+
+        // ***********************************************
+        // ** JAVASCRIPT LOGIC IMPLEMENTATION NEEDED BELOW **
+        // ***********************************************
+
+        // --- Core Functions ---
+
+        /**
+         * Initializes the application by setting up the auth state listener.
+         */
+        function initializeApp() {
+            setLoading(true, "Initializing App...");
+            // Listen for authentication state changes
+            fbAuth.onAuthStateChanged(handleAuthStateChange);
+
+            // Handle potential race condition if auth state is already known
+            // when the listener is attached.
+            const initialUser = fbAuth.currentUser;
+            if (initialUser) {
+                console.log("Initial user found on load.");
+                handleAuthStateChange(initialUser);
+            } else {
+                console.log("No initial user found.");
+                showView('login-view'); // Show login if no user
+                setLoading(false);
+            }
+            console.log("App Initialized.");
+        }
+
+        /**
+         * Handles changes in Firebase authentication state (login/logout).
+         * Checks admin status and shows the appropriate dashboard.
+         * @param {firebase.User | null} user The logged-in user object or null if logged out.
+         */
+        async function handleAuthStateChange(user) {
+            console.log("Auth state changed. User:", user ? user.uid : 'None');
+            // Clear test state if user logs out or changes
+            if (testTimerInterval) clearInterval(testTimerInterval);
+            currentTestMCQs = []; userAnswers = []; reviewResultsCache = null;
+
+            if (user) {
+                setLoading(true, "Verifying user...");
+                currentUser = user; // Set global currentUser
+                try {
+                    isAdmin = await checkAdminStatus(user.uid);
+                    console.log("Admin Status:", isAdmin);
+                    updateUserInfoUI(user);
+
+                    if (isAdmin) {
+                        showView('admin-dashboard-view');
+                        await loadAdminTests(user.uid);
+                    } else {
+                        showView('user-dashboard-view');
+                        await loadPublicTests();
+                    }
+                } catch (error) {
+                     console.error("Error during post-login setup:", error);
+                     alert(`Error setting up dashboard: ${error.message}`);
+                     showView('user-dashboard-view'); // Default to user view on error
+                     await loadPublicTests(); // Attempt to load public tests anyway
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(true, "Logging out..."); // Show loading briefly on logout
+                currentUser = null;
+                isAdmin = false;
+                showView('login-view');
+                // Short delay before hiding loading on logout for smoother transition
+                setTimeout(() => setLoading(false), 200);
+            }
+        }
+
+        /**
+         * Checks if the given userId belongs to an admin by checking the 'admins' collection.
+         * @param {string} userId The user's Firebase UID.
+         * @returns {Promise<boolean>} True if the user is an admin, false otherwise.
+         */
+        async function checkAdminStatus(userId) {
+            // TODO: Implement Firestore query to check if userId exists in 'admins' collection.
+            // Remember to set appropriate Firestore Security Rules for the 'admins' collection.
+            console.log(`Checking admin status for ${userId}...`);
+             if (!userId) return false;
+             try {
+                 const adminDocRef = db.collection('admins').doc(userId);
+                 const docSnap = await adminDocRef.get();
+                 console.log(`Admin check result: ${docSnap.exists}`);
+                 return docSnap.exists;
+             } catch (error) {
+                 console.error("Error checking admin status:", error);
+                 // Decide how to handle errors - default to non-admin for safety
+                 return false;
+             }
+        }
+
+        /**
+         * Updates the user email display in the dashboard headers.
+         * @param {firebase.User} user The logged-in user object.
+         */
+        function updateUserInfoUI(user) {
+            // TODO: Update the text content of adminUserEmail and userUserEmail spans.
+             if (!user) return;
+             const email = user.email || "User";
+             if(adminUserEmail) adminUserEmail.textContent = email;
+             if(userUserEmail) userUserEmail.textContent = email;
+             console.log("User info UI updated.");
+        }
+
+        /**
+         * Shows the specified view container and hides others.
+         * @param {string} viewId The ID of the view container div to show.
+         */
+        function showView(viewId) {
+            // TODO: Implement logic to add 'active-view' class to the target view
+            // and remove it from all other '.view-container' elements.
+            console.log("Switching view to:", viewId);
+            document.querySelectorAll('.view-container').forEach(view => {
+                view.classList.remove('active-view');
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.add('active-view');
+                currentView = viewId;
+                 // Reset scroll position when changing views
+                 window.scrollTo(0, 0);
+            } else {
+                console.error("View not found:", viewId);
+                document.getElementById('login-view')?.classList.add('active-view'); // Fallback
+                currentView = 'login';
+            }
+        }
+
+        /**
+         * Shows or hides the loading overlay and disables/enables UI elements.
+         * @param {boolean} isLoading True to show loading, false to hide.
+         * @param {string} [message="Loading..."] The message to display.
+         */
+        function setLoading(isLoading, message = "Loading...") {
+            // TODO: Implement logic to show/hide loadingOverlay, update loadingMessage,
+            // and disable/enable relevant buttons/inputs based on isLoading state.
+            // Be careful not to disable elements needed to stop the loading (e.g., maybe logout).
+             if (loadingOverlay && loadingMessage) {
+                 loadingMessage.textContent = message;
+                 loadingOverlay.style.display = isLoading ? 'flex' : 'none';
+             }
+
+             // Select potentially interactive elements
+             const elements = document.querySelectorAll('button, input[type="checkbox"].public-toggle-switch');
+
+             elements.forEach(el => {
+                 // Don't disable elements inside the loading overlay itself
+                 if (!loadingOverlay || !loadingOverlay.contains(el)) {
+                     // Handle logout buttons separately: disable only if logging out
+                     if ((el.id === 'admin-logout-btn' || el.id === 'user-logout-btn')) {
+                         if (isLoading && message.toLowerCase().includes('logging out')) {
+                             el.disabled = true;
+                         } else {
+                             el.disabled = !currentUser; // Keep enabled if user is logged in, disable otherwise
+                         }
+                     }
+                     // Handle login button separately: disable if loading OR if user is logged in
+                     else if (el.id === 'login-google-btn') {
+                         el.disabled = isLoading || !!currentUser;
+                     }
+                     // Disable other elements when loading is true
+                     else {
+                         el.disabled = isLoading;
+                     }
+                 }
+             });
+            console.log(`Loading state set to ${isLoading} with message: ${message}`);
+        }
+
+
+        // --- Authentication Functions ---
+
+        /**
+         * Initiates the Google Sign-In popup flow.
+         */
+        async function signInWithGoogle() {
+            // TODO: Implement Firebase Google Sign-In popup.
+            // handleAuthStateChange will manage the result.
+             const provider = new firebase.auth.GoogleAuthProvider();
+             // Add scopes if needed, e.g., provider.addScope('profile');
+             try {
+                 setLoading(true, "Redirecting to Google..."); // Indicate action
+                 console.log("Starting Google Sign-In...");
+                 await fbAuth.signInWithPopup(provider);
+                 // No need to setLoading(false) here, onAuthStateChanged will handle it.
+                 console.log("Sign-in popup closed.");
+             } catch (error) {
+                 console.error("Google Sign-In Error:", error);
+                 loginError.textContent = `Login failed: ${error.code || error.message}`;
+                 loginError.style.display = 'block';
+                 setLoading(false); // Hide loading on error
+             }
+        }
+
+        /**
+         * Signs the current user out.
+         */
+        async function signOut() {
+            // TODO: Implement Firebase Sign Out.
+            // handleAuthStateChange will manage the result.
+             try {
+                 setLoading(true, "Logging out...");
+                 await fbAuth.signOut();
+                 console.log("Sign out successful.");
+                 // No need to setLoading(false) here, onAuthStateChanged will handle it.
+             } catch (error) {
+                 console.error("Sign Out Error:", error);
+                 alert(`Logout failed: ${error.message}`); // Simple alert for logout error
+                 setLoading(false); // Hide loading on error
+             }
+        }
+
+
+        // --- Admin Dashboard Functions ---
+
+        /**
+         * Loads tests created by the current admin from Firestore.
+         * @param {string} adminUserId The UID of the admin user.
+         */
+        async function loadAdminTests(adminUserId) {
+            // TODO: Query 'testReviews' collection where 'userId' == adminUserId.
+            // Order by 'savedAt' descending.
+            // Populate adminTestListContainer using createAdminTestListItem for each test.
+            // Handle empty results and errors.
+             if (!adminUserId) return;
+             adminTestListContainer.innerHTML = '<p>Loading your tests...</p>';
+             setLoading(true, "Loading Admin Tests..."); // Use setLoading
+
+             try {
+                 const snapshot = await db.collection('testReviews')
+                                         .where('userId', '==', adminUserId)
+                                         .orderBy('savedAt', 'desc')
+                                         .get();
+
+                 adminTestListContainer.innerHTML = ''; // Clear loading message
+                 if (snapshot.empty) {
+                     adminTestListContainer.innerHTML = '<p>You haven\'t created or saved any tests yet.</p>';
+                 } else {
+                     snapshot.forEach(doc => {
+                         const testData = { id: doc.id, ...doc.data() };
+                         // Basic validation: Check if originalMCQs exists, though it might be empty
+                         if (testData.originalMCQs) {
+                            const testItem = createAdminTestListItem(testData);
+                            adminTestListContainer.appendChild(testItem);
+                         } else {
+                            console.warn(`Admin test ${testData.id} skipped - missing originalMCQs field.`);
+                         }
+                     });
+                 }
+             } catch (error) {
+                 console.error("Error loading admin tests:", error);
+                 adminTestListContainer.innerHTML = '<p class="error-message">Error loading your tests. Check console and Firestore rules.</p>';
+             } finally {
+                  setLoading(false); // Stop loading indicator
+             }
+        }
+
+        /**
+         * Creates the HTML element for a single test item in the admin dashboard.
+         * @param {object} testData The data for the test from Firestore.
+         * @returns {HTMLElement} The created div element for the test card.
+         */
+        function createAdminTestListItem(testData) {
+            // TODO: Create the card structure (div.test-card.admin-test-item).
+            // Include title, details, toggle switch, status text, delete button.
+            // Add event listeners for the toggle switch and delete button.
+            // Return the created element.
+
+             const item = document.createElement('div');
+             item.className = 'test-card admin-test-item';
+             item.dataset.testid = testData.id;
+
+             // Content Section (Title, Details)
+             const contentDiv = document.createElement('div');
+             const titleSpan = document.createElement('div');
+             titleSpan.className = 'test-title';
+             titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             const detailsSpan = document.createElement('div');
+             detailsSpan.className = 'test-details';
+             const dateStr = testData.savedAt?.toDate ? testData.savedAt.toDate().toLocaleDateString() : 'N/A';
+             const qCount = testData.originalMCQs?.length || 0;
+             detailsSpan.textContent = `Saved: ${dateStr} | Score: ${testData.summary?.score || 'N/A'} | ${qCount} Qs`;
+             contentDiv.appendChild(titleSpan);
+             contentDiv.appendChild(detailsSpan);
+
+             // Actions Section
+             const actionsDiv = document.createElement('div');
+             actionsDiv.className = 'actions admin-actions';
+
+             // Public Toggle Label (Container)
+             const toggleLabel = document.createElement('label');
+             toggleLabel.className = 'public-status-label';
+             toggleLabel.title = 'Toggle Public Access';
+             const switchDiv = document.createElement('div'); // Visual switch container
+             switchDiv.className = 'switch';
+             const toggleInput = document.createElement('input'); // The actual checkbox
+             toggleInput.type = 'checkbox';
+             toggleInput.className = 'public-toggle-switch';
+             toggleInput.checked = testData.isPublic === true;
+             toggleInput.dataset.testid = testData.id;
+             toggleInput.addEventListener('change', handlePublicToggleChange); // Attach listener
+             const sliderSpan = document.createElement('span');
+             sliderSpan.className = 'slider round';
+             switchDiv.appendChild(toggleInput);
+             switchDiv.appendChild(sliderSpan);
+             const statusSpan = document.createElement('span'); // Text label (Public/Private)
+             statusSpan.className = 'public-status ' + (testData.isPublic === true ? 'public' : 'private');
+             statusSpan.textContent = testData.isPublic === true ? 'Public' : 'Private';
+             toggleLabel.appendChild(switchDiv);
+             toggleLabel.appendChild(statusSpan);
+
+             // Delete Button
+             const deleteBtn = document.createElement('button');
+             deleteBtn.textContent = 'Delete';
+             deleteBtn.className = 'admin-delete-btn danger secondary'; // Use classes for styling
+             deleteBtn.dataset.testid = testData.id;
+             deleteBtn.addEventListener('click', handleDeleteTestClick); // Attach listener
+
+             actionsDiv.appendChild(toggleLabel);
+             actionsDiv.appendChild(deleteBtn);
+             // TODO: Add View/Reattempt buttons if needed for Admin view
+
+             // Assemble Card
+             item.appendChild(contentDiv);
+             item.appendChild(actionsDiv);
+
+             return item;
+        }
+
+        /**
+         * Handles the change event of the public toggle switch for a test.
+         * Updates the 'isPublic' status in Firestore.
+         * @param {Event} event The change event object.
+         */
+        async function handlePublicToggleChange(event) {
+            // TODO: Get testId and newStatus from event.target.
+            // Disable the checkbox temporarily.
+            // Update the 'isPublic' field in the corresponding Firestore document.
+            // Update the status text (Public/Private) next to the toggle.
+            // Handle errors and re-enable the checkbox.
+             const checkbox = event.target;
+             const testId = checkbox.dataset.testid;
+             const newStatus = checkbox.checked;
+             const listItem = checkbox.closest('.admin-test-item'); // Find parent card
+             const statusSpan = listItem?.querySelector('.public-status');
+             const toggleLabel = listItem?.querySelector('.public-status-label');
+
+             if (!testId || !listItem) {
+                 console.error("Could not find test ID or list item for toggle change.");
+                 return;
+             }
+
+             console.log(`Toggling test ${testId} to ${newStatus ? 'Public' : 'Private'}`);
+             if (toggleLabel) toggleLabel.style.pointerEvents = 'none'; // Prevent rapid clicks
+             checkbox.disabled = true;
+             setLoading(true, "Updating status..."); // Show overlay
+
+             try {
+                 const testDocRef = db.collection('testReviews').doc(testId);
+                 await testDocRef.update({ isPublic: newStatus }); // Update Firestore
+                 console.log(`Test ${testId} status updated successfully.`);
+                 // Update UI immediately
+                 if (statusSpan) {
+                     statusSpan.textContent = newStatus ? 'Public' : 'Private';
+                     statusSpan.className = 'public-status ' + (newStatus ? 'public' : 'private');
+                 }
+             } catch (error) {
+                 console.error(`Error updating test ${testId} status:`, error);
+                 alert('Failed to update test status. Please check Firestore rules and connection.');
+                 // Revert UI on error
+                 checkbox.checked = !newStatus;
+                 if (statusSpan) {
+                     statusSpan.textContent = !newStatus ? 'Public' : 'Private';
+                     statusSpan.className = 'public-status ' + (!newStatus ? 'public' : 'private');
+                 }
+             } finally {
+                 checkbox.disabled = false;
+                 if (toggleLabel) toggleLabel.style.pointerEvents = 'auto';
+                 setLoading(false); // Hide overlay
+             }
+        }
+
+        /**
+         * Handles the click event of the delete button for a test.
+         * Confirms deletion and removes the test document from Firestore.
+         * @param {Event} event The click event object.
+         */
+        async function handleDeleteTestClick(event) {
+            // TODO: Get testId from event.target.
+            // Confirm deletion with the user.
+            // If confirmed, delete the Firestore document.
+            // Remove the corresponding list item from the UI.
+            // Handle errors.
+             const button = event.target;
+             const testId = button.dataset.testid;
+             const listItem = button.closest('.admin-test-item');
+             const title = listItem?.querySelector('.test-title')?.textContent || 'this test';
+
+             if (!testId || !listItem) return;
+
+             // Confirmation dialog
+             if (confirm(`DELETE TEST\n\n"${title}"\n\nAre you sure? This action cannot be undone.`)) {
+                 setLoading(true, "Deleting test...");
+                 button.disabled = true; // Disable button during deletion
+                 listItem.style.opacity = '0.5'; // Visual feedback
+
+                 try {
+                     const testDocRef = db.collection('testReviews').doc(testId);
+                     await testDocRef.delete(); // Delete from Firestore
+                     console.log(`Deleted test ${testId}`);
+                     listItem.remove(); // Remove from the UI
+                     // Optional: Show a success message
+                 } catch (error) {
+                     console.error(`Error deleting test ${testId}:`, error);
+                     alert('Failed to delete the test. Please check Firestore rules and connection.');
+                     // Restore button and item appearance on error
+                     button.disabled = false;
+                     listItem.style.opacity = '1';
+                 } finally {
+                     setLoading(false);
+                 }
+             } else {
+                 console.log(`Deletion cancelled for test ${testId}`);
+             }
+        }
+
+
+        // --- User Dashboard Functions ---
+
+        /**
+         * Loads publicly available tests from Firestore.
+         */
+        async function loadPublicTests() {
+            // TODO: Query 'testReviews' collection where 'isPublic' == true.
+            // Order by 'savedAt' or title.
+            // Populate userTestListContainer using createUserTestListItem.
+            // Handle empty results and errors (display message in userTestListError).
+             userTestListContainer.innerHTML = '<p>Loading available tests...</p>';
+             userTestListError.style.display = 'none'; // Hide previous errors
+             setLoading(true, "Loading Available Tests...");
+
+             try {
+                 const snapshot = await db.collection('testReviews')
+                                         .where('isPublic', '==', true) // Query for public tests
+                                         .orderBy('savedAt', 'desc') // Example ordering
+                                         .get();
+
+                 userTestListContainer.innerHTML = ''; // Clear loading message
+                 if (snapshot.empty) {
+                     userTestListContainer.innerHTML = '<p>No public tests are available at the moment. Please check back later.</p>';
+                 } else {
+                     snapshot.forEach(doc => {
+                         const testData = { id: doc.id, ...doc.data() };
+                         // Validate data before creating item
+                         if (testData.originalMCQs && testData.originalMCQs.length > 0) {
+                             const testItem = createUserTestListItem(testData);
+                             userTestListContainer.appendChild(testItem);
+                         } else {
+                             // Log tests that are public but have no questions (might indicate an issue)
+                             console.warn(`Public test ${testData.id} has no questions and will not be displayed.`);
+                         }
+                     });
+                 }
+             } catch (error) {
+                 console.error("Error loading public tests:", error);
+                 // Display the specific error message to the user
+                 userTestListContainer.innerHTML = ''; // Clear loading message
+                 userTestListError.textContent = `Error loading available tests. Please try again later. (Details: ${error.message})`;
+                 userTestListError.style.display = 'block';
+                 // This addresses the error shown in the user's screenshot
+             } finally {
+                 setLoading(false);
+             }
+        }
+
+        /**
+         * Creates the HTML element for a single test item in the user dashboard.
+         * @param {object} testData The data for the test from Firestore.
+         * @returns {HTMLElement} The created div element for the test card.
+         */
+        function createUserTestListItem(testData) {
+            // TODO: Create the card structure (div.test-card.user-test-item).
+            // Include title, details (like number of questions), and a "Start Test" button.
+            // Add event listener for the start button.
+            // Return the created element.
+             const item = document.createElement('div');
+             item.className = 'test-card user-test-item';
+             item.dataset.testid = testData.id;
+
+             // Content Section
+             const contentDiv = document.createElement('div');
+             const titleSpan = document.createElement('div');
+             titleSpan.className = 'test-title';
+             titleSpan.textContent = testData.testTitle || '(Untitled Test)';
+             const detailsSpan = document.createElement('div');
+             detailsSpan.className = 'test-details';
+             const qCount = testData.originalMCQs?.length || 0;
+             detailsSpan.textContent = `${qCount} Questions`; // Display question count
+             contentDiv.appendChild(titleSpan);
+             contentDiv.appendChild(detailsSpan);
+
+             // Actions Section
+             const actionsDiv = document.createElement('div');
+             actionsDiv.className = 'actions';
+             const startBtn = document.createElement('button');
+             startBtn.textContent = 'Start Test';
+             startBtn.className = 'start-test-btn'; // Class for event delegation
+             startBtn.dataset.testid = testData.id; // Link button to test ID
+             // Event listener will be added via delegation on the container
+
+             actionsDiv.appendChild(startBtn);
+
+             // Assemble Card
+             item.appendChild(contentDiv);
+             item.appendChild(actionsDiv);
+
+             return item;
+        }
+
+        /**
+         * Handles the click event for the "Start Test" button.
+         * Fetches the full test data and transitions to the mock test view.
+         * @param {Event} event The click event object.
+         */
+        async function handleStartTestClick(event) {
+            // TODO: Get testId from event.target.
+            // Fetch the specific test document (including originalMCQs) from Firestore.
+            // Initialize test state (currentTestMCQs, userAnswers, etc.).
+            // Call displayTestQuestion(0), renderQuestionPalette(), startTestTimer().
+            // Call showView('mock-test-view').
+            // Handle errors.
+             const button = event.target.closest('.start-test-btn'); // Ensure we get the button
+             if (!button) return; // Exit if click wasn't on the button or its child
+
+             const testId = button.dataset.testid;
+             if (!testId) {
+                 console.error("Start button clicked but test ID not found.");
+                 return;
+             }
+
+             console.log(`Attempting to start test: ${testId}`);
+             setLoading(true, "Loading test questions...");
+             button.disabled = true; // Prevent multiple clicks
+
+             try {
+                 const testDocRef = db.collection('testReviews').doc(testId);
+                 const docSnap = await testDocRef.get();
+
+                 if (!docSnap.exists) {
+                     throw new Error("Test data could not be found. It might have been deleted.");
+                 }
+
+                 const testData = docSnap.data();
+                 const mcqs = testData.originalMCQs;
+
+                 if (!mcqs || mcqs.length === 0) {
+                     throw new Error("This test currently has no questions.");
+                 }
+
+                 // --- Initialize Test State ---
+                 currentTestMCQs = mcqs; // Load questions
+                 currentQuestionIndex = 0; // Start at first question
+                 // Initialize answers array with objects for answer index and marked status
+                 userAnswers = new Array(mcqs.length).fill(null).map(() => ({ answerIndex: null, marked: false }));
+                 reviewResultsCache = null; // Clear previous review data
+                 if (testTimerInterval) clearInterval(testTimerInterval); // Clear old timer
+
+                 // --- Setup Test UI ---
+                 testTitle.textContent = testData.testTitle || "Mock Test"; // Set title in test view
+                 displayTestQuestion(0); // Display the first question
+                 renderQuestionPalette(); // Create the palette buttons
+                 startTestTimer(); // Start the clock
+
+                 showView('mock-test-view'); // Show the test taking screen
+
+             } catch (error) {
+                 console.error(`Error starting test ${testId}:`, error);
+                 alert(`Failed to load test: ${error.message}`);
+                 button.disabled = false; // Re-enable button on error
+             } finally {
+                 setLoading(false); // Hide loading overlay
+             }
+        }
+
+
+        // --- Mock Test Functions ---
+
+        /**
+         * Displays a specific question and its options in the test view.
+         * @param {number} index The index of the question to display.
+         */
+        function displayTestQuestion(index) {
+            // TODO: Implement logic as described in previous thoughts/responses.
+            // Get question data from currentTestMCQs[index].
+            // Update testQuestionNumber, testQuestion, testOptionsContainer.
+            // Check the correct radio button based on userAnswers[index].answerIndex.
+            // Update navigation button states (prev/next).
+            // Update question counter.
+            // Update palette highlight.
+            // Update Mark for Review button text/state based on userAnswers[index].marked.
+            // Typeset MathJax if needed.
+             if (index < 0 || index >= currentTestMCQs.length) {
+                console.warn(`Invalid question index requested: ${index}`);
+                return;
+             }
+             currentQuestionIndex = index; // Update global state
+             const questionData = currentTestMCQs[index];
+             const questionText = questionData.question?.en || "(Question text missing)"; // Defaulting to English
+             const options = questionData.options || [];
+             const currentAnswerState = userAnswers[index] || { answerIndex: null, marked: false }; // Ensure state exists
+
+             // Update Question Number and Text
+             testQuestionNumber.textContent = `Question ${index + 1}`;
+             testQuestion.innerHTML = questionText; // Use innerHTML for MathJax/HTML
+
+             // Update Options
+             testOptionsContainer.innerHTML = ''; // Clear previous options
+             const optionLetters = ['A', 'B', 'C', 'D'];
+             options.forEach((optionObj, optionIndex) => {
+                 if (optionIndex >= optionLetters.length) return; // Max 4 options assumed
+                 const optionText = optionObj?.en || '(Option text missing)'; // Defaulting to English
+
+                 const label = document.createElement('label');
+                 const input = document.createElement('input');
+                 input.type = 'radio';
+                 input.name = `q_${index}`; // Group radios
+                 input.value = optionIndex; // Store index as value
+                 input.checked = (currentAnswerState.answerIndex === optionIndex); // Check based on state
+                 input.addEventListener('change', () => handleOptionSelect(optionIndex)); // Add listener
+
+                 const optionTextSpan = document.createElement('span');
+                 optionTextSpan.className = 'option-text'; // For styling
+                 optionTextSpan.textContent = ` ${optionLetters[optionIndex]}. ${optionText}`;
+
+                 const radioCustomSpan = document.createElement('span'); // For custom radio button style
+                 radioCustomSpan.className = 'radio-custom';
+
+                 label.appendChild(input);
+                 label.appendChild(optionTextSpan);
+                 label.appendChild(radioCustomSpan); // Append custom radio element
+
+                 testOptionsContainer.appendChild(label);
+             });
+
+             // Typeset MathJax after adding content
+             if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+                setTimeout(() => { // Delay ensures DOM is ready
+                     MathJax.typesetPromise([testQuestion, testOptionsContainer])
+                           .catch(err => console.error('MathJax typesetting error:', err));
+                }, 50);
+             }
+
+             // Update Navigation and Counter
+             prevQuestionBtn.disabled = (index === 0);
+             nextQuestionBtn.disabled = (index === currentTestMCQs.length - 1);
+             questionCounter.textContent = `Q: ${index + 1} / ${currentTestMCQs.length}`;
+
+             // Update Palette and Mark Button
+             updatePaletteHighlight();
+             markReviewBtn.textContent = currentAnswerState.marked ? 'Unmark Review' : 'Mark for Review';
+             markReviewBtn.style.borderColor = currentAnswerState.marked ? 'var(--accent-color)' : '';
+        }
+
+        /**
+         * Renders the question palette buttons based on the current test.
+         */
+        function renderQuestionPalette() {
+            // TODO: Clear existing palette buttons.
+            // Loop through currentTestMCQs.length.
+            // Create a button for each question number (1 to N).
+            // Set dataset.qindex = loop index.
+            // Add event listener (handlePaletteClick).
+            // Append button to questionPalette element.
+            // Call updatePaletteHighlight() after rendering.
+             questionPalette.innerHTML = ''; // Clear previous buttons
+             currentTestMCQs.forEach((_, i) => {
+                 const button = document.createElement('button');
+                 button.textContent = i + 1;
+                 button.dataset.qindex = i;
+                 button.title = `Go to Question ${i + 1}`;
+                 button.addEventListener('click', handlePaletteClick);
+                 questionPalette.appendChild(button);
+             });
+             updatePaletteHighlight(); // Set initial styles
+        }
+
+        /**
+         * Updates the visual style (answered, marked, current) of all palette buttons.
+         */
+        function updatePaletteHighlight() {
+            // TODO: Loop through all buttons in questionPalette.
+            // Get the index from dataset.qindex.
+            // Check userAnswers[index] status (answered, marked).
+            // Check if index === currentQuestionIndex.
+            // Add/remove CSS classes ('answered', 'marked', 'current') accordingly.
+             questionPalette.querySelectorAll('button').forEach(button => {
+                 const index = parseInt(button.dataset.qindex, 10);
+                 if (!isNaN(index) && index < userAnswers.length) {
+                     const answerState = userAnswers[index];
+                     button.classList.remove('answered', 'marked', 'current'); // Reset
+
+                     if (answerState?.answerIndex !== null && answerState?.answerIndex !== undefined) {
+                         button.classList.add('answered');
+                     }
+                     if (answerState?.marked) {
+                         button.classList.add('marked');
+                     }
+                     if (index === currentQuestionIndex) {
+                         button.classList.add('current');
+                     }
+                 }
+             });
+        }
+
+        /**
+         * Handles clicks on the question palette buttons.
+         * @param {Event} event The click event object.
+         */
+        function handlePaletteClick(event) {
+            // TODO: Get index from event.target.dataset.qindex.
+            // Call displayTestQuestion(index).
+             const button = event.target.closest('button');
+             if (button && button.dataset.qindex !== undefined) {
+                 const index = parseInt(button.dataset.qindex, 10);
+                 if (!isNaN(index)) {
+                     displayTestQuestion(index);
+                 }
+             }
+        }
+
+        /**
+         * Updates the user's answer state when a radio button is selected.
+         * @param {number} optionIndex The index of the selected option.
+         */
+        function handleOptionSelect(optionIndex) {
+            // TODO: Update userAnswers[currentQuestionIndex].answerIndex.
+            // Call updatePaletteHighlight().
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].answerIndex = optionIndex;
+             } else {
+                 // Should be initialized, but handle defensively
+                 userAnswers[currentQuestionIndex] = { answerIndex: optionIndex, marked: false };
+             }
+             console.log(`Q${currentQuestionIndex + 1} Answered: Option ${optionLetters[optionIndex] || optionIndex}`);
+             updatePaletteHighlight(); // Update the palette immediately
+        }
+
+        /**
+         * Toggles the 'marked for review' status for the current question.
+         */
+        function handleMarkReviewClick() {
+            // TODO: Toggle userAnswers[currentQuestionIndex].marked.
+            // Update markReviewBtn text ('Mark'/'Unmark').
+            // Call updatePaletteHighlight().
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].marked = !userAnswers[currentQuestionIndex].marked;
+                 const isMarked = userAnswers[currentQuestionIndex].marked;
+                 markReviewBtn.textContent = isMarked ? 'Unmark Review' : 'Mark for Review';
+                 markReviewBtn.style.borderColor = isMarked ? 'var(--accent-color)' : ''; // Optional visual cue
+                 console.log(`Q${currentQuestionIndex + 1} Marked for review: ${isMarked}`);
+                 updatePaletteHighlight();
+             }
+        }
+
+        /**
+         * Clears the selected answer for the current question.
+         */
+        function handleClearResponseClick() {
+            // TODO: Set userAnswers[currentQuestionIndex].answerIndex to null.
+            // Uncheck all radio buttons for the current question visually.
+            // Call updatePaletteHighlight().
+             if (userAnswers[currentQuestionIndex]) {
+                 userAnswers[currentQuestionIndex].answerIndex = null; // Clear the answer index
+                 // Uncheck radio buttons for this question
+                 const radioButtons = testOptionsContainer.querySelectorAll(`input[name="q_${currentQuestionIndex}"]`);
+                 radioButtons.forEach(rb => rb.checked = false);
+                 console.log(`Q${currentQuestionIndex + 1} Response Cleared`);
+                 updatePaletteHighlight(); // Update palette
+             }
+        }
+
+        /**
+         * Handles clicks on the Previous/Next navigation buttons.
+         * @param {'prev' | 'next'} direction The direction to navigate.
+         */
+        function handleTestNavigation(direction) {
+            // TODO: Calculate newIndex based on direction and bounds.
+            // Call displayTestQuestion(newIndex).
+             let newIndex = currentQuestionIndex;
+             if (direction === 'prev' && currentQuestionIndex > 0) {
+                 newIndex--;
+             } else if (direction === 'next' && currentQuestionIndex < currentTestMCQs.length - 1) {
+                 newIndex++;
+             }
+
+             if (newIndex !== currentQuestionIndex) {
+                 displayTestQuestion(newIndex);
+             }
+        }
+
+        /**
+         * Starts the test timer interval.
+         */
+        function startTestTimer() {
+            // TODO: Clear any existing interval.
+            // Set testStartTime = Date.now().
+            // Start setInterval to update testTimer text content every second.
+             if (testTimerInterval) clearInterval(testTimerInterval); // Clear previous timer
+             testStartTime = Date.now();
+             testTimer.textContent = `Time: 00:00`; // Reset display
+             console.log("Test timer started.");
+
+             testTimerInterval = setInterval(() => {
+                 const elapsedSeconds = Math.floor((Date.now() - testStartTime) / 1000);
+                 const minutes = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
+                 const seconds = (elapsedSeconds % 60).toString().padStart(2, '0');
+                 testTimer.textContent = `Time: ${minutes}:${seconds}`;
+             }, 1000); // Update every second
+        }
+
+        /**
+         * Handles the submission of the test.
+         */
+        function submitTest() {
+            // TODO: Confirm submission with the user.
+            // Stop the timer (clearInterval).
+            // Calculate results using calculateResults().
+            // Store results in reviewResultsCache.
+            // Call displayReview().
+            // Call showView('review-view').
+             // Optional: Check for unanswered questions
+             const unansweredCount = userAnswers.filter(a => a.answerIndex === null).length;
+             let confirmationMessage = "Are you sure you want to submit the test?";
+             if (unansweredCount > 0) {
+                 confirmationMessage += `\n\nYou have ${unansweredCount} unanswered question(s).`;
+             }
+
+             if (confirm(confirmationMessage)) {
+                 console.log("Submitting test...");
+                 if (testTimerInterval) clearInterval(testTimerInterval); // Stop the timer
+                 const endTime = Date.now();
+                 const timeTakenMs = testStartTime ? endTime - testStartTime : 0;
+
+                 // Calculate results
+                 reviewResultsCache = calculateResults(currentTestMCQs, userAnswers, timeTakenMs);
+                 console.log("Test results calculated:", reviewResultsCache);
+
+                 // Display review
+                 displayReview(reviewResultsCache);
+                 showView('review-view');
+             } else {
+                 console.log("Test submission cancelled.");
+             }
+        }
+
+        /**
+         * Calculates the test results based on answers provided.
+         * @param {Array} mcqs The array of original MCQ objects.
+         * @param {Array} answersState The array of user answer state objects.
+         * @param {number} timeMs The total time taken in milliseconds.
+         * @returns {object} An object containing the review questions and summary.
+         */
+        function calculateResults(mcqs, answersState, timeMs) {
+            // TODO: Implement result calculation logic as described previously.
+            // Compare userAnswers[i].answerIndex with mcqs[i].answer.
+            // Count correct, incorrect, skipped.
+            // Format reviewQuestions array.
+            // Return the results object.
+             console.log("Calculating results...");
+             let correctCount = 0, incorrectCount = 0, skippedCount = 0;
+             const reviewQuestions = []; // For display in review view
+
+             mcqs.forEach((q, idx) => {
+                 const uAnswerState = answersState[idx]; // { answerIndex: null/0/1.., marked: false }
+                 const uAIdx = uAnswerState?.answerIndex;
+
+                 const opts = q.options || [];
+                 const cALtr = q.answer?.trim().toUpperCase(); // Correct answer letter (A, B, C, D)
+                 // Convert correct answer letter to index (0, 1, 2, 3)
+                 const cAIdx = cALtr ? cALtr.charCodeAt(0) - 'A'.charCodeAt(0) : -1;
+                 // Get correct answer text (defaulting to English)
+                 const cATxtE = (cAIdx >= 0 && cAIdx < opts.length) ? (opts[cAIdx]?.en || '?') : "N/A";
+
+                 let uATxtE = "Skipped"; // User's answer text (defaulting to English)
+                 let st = "skipped"; // Status: correct, incorrect, skipped
+
+                 if (uAIdx !== null && uAIdx !== undefined) { // If an answer was selected
+                     if (uAIdx >= 0 && uAIdx < opts.length) { // Check if index is valid
+                         uATxtE = opts[uAIdx]?.en || '?'; // Get user's selected option text
+                         if (uAIdx === cAIdx) {
+                             st = "correct"; correctCount++;
+                         } else {
+                             st = "incorrect"; incorrectCount++;
+                         }
+                     } else { // Should not happen with radio buttons, but handle defensively
+                         uATxtE = "Invalid Option"; st = "incorrect"; incorrectCount++;
+                     }
+                 } else { // No answer selected (index is null/undefined)
+                     skippedCount++;
+                 }
+
+                 // Add details for the review screen
+                 reviewQuestions.push({
+                     question: q.question?.en || '?', // Defaulting to English
+                     correctAnswer: cATxtE,
+                     userAnswer: uATxtE,
+                     status: st,
+                     explanation: q.explanation?.en || "No explanation provided.", // Defaulting to English
+                     markedForReview: uAnswerState?.marked || false // Include marked status
+                 });
+             });
+
+             const total = mcqs.length;
+             const score = `${correctCount}/${total}`;
+             const timeS = Math.round(timeMs / 1000);
+             const mins = Math.floor(timeS / 60);
+             const secs = timeS % 60;
+             const timeStr = `${mins}m ${secs}s`;
+
+             // Return the structured results
+             return {
+                 questions: reviewQuestions, // Detailed results per question
+                 summary: { score, correct: correctCount, incorrect: incorrectCount, skipped: skippedCount, timeString: timeStr },
+                 testDate: new Date().toISOString(),
+                 timeTakenMs: timeMs,
+                 testTitle: testTitle.textContent, // Get title from the test view header during submission
+                 originalMCQs: mcqs // Include original MCQs for potential reattempt
+             };
+        }
+
+
+        // --- Review Functions ---
+
+        /**
+         * Displays the calculated test review results.
+         * @param {object} reviewData The results object from calculateResults.
+         */
+        function displayReview(reviewData) {
+            // TODO: Implement review display logic as described previously.
+            // Update reviewTitle, reviewSummary.
+            // Clear and populate reviewContent with review items.
+            // Show/hide reviewFilters based on results.
+            // Typeset MathJax if needed.
+             console.log("Displaying review...");
+             reviewContent.innerHTML = ''; // Clear previous review
+             reviewSummary.innerHTML = ''; // Clear previous summary
+             reviewFilters.style.display = 'none'; // Hide filters initially
+
+             if (!reviewData?.questions?.length || !reviewData.summary) {
+                 reviewSummary.innerHTML = "<span>Review data is unavailable.</span>";
+                 console.warn("displayReview called with invalid data.");
+                 return;
+             }
+
+             // Display Summary
+             const { score, correct, incorrect, skipped, timeString } = reviewData.summary;
+             reviewSummary.innerHTML = `<span>Score: ${score}</span> | <span class="score-correct">Correct: ${correct}</span> | <span class="score-incorrect">Incorrect: ${incorrect}</span> | <span class="score-skipped">Skipped: ${skipped}</span> | <span>Time: ${timeString}</span>`;
+             reviewTitle.textContent = reviewData.testTitle || "Test Review"; // Use title from results
+
+             // Display Individual Question Reviews
+             reviewData.questions.forEach((qSum, idx) => {
+                 const rItem = document.createElement('div');
+                 rItem.className = 'review-item';
+                 rItem.dataset.status = qSum.status; // Set status for filtering
+
+                 let answerHtml = '';
+                 const userAnsClass = `user-answer-${qSum.status}`;
+                 // Display user answer (and if it was marked)
+                 answerHtml += `<span class="${userAnsClass}">Your Answer: ${qSum.userAnswer} ${qSum.markedForReview ? '<span style="font-size:0.8em; color:var(--accent-color);">(Marked)</span>' : ''}</span>`;
+
+                 // Display correct answer only if user was wrong or skipped
+                 if (qSum.status !== 'correct') {
+                     answerHtml += `<br><span class="correct-answer">Correct Answer: ${qSum.correctAnswer}</span>`;
+                 }
+
+                 // Construct the review item HTML
+                 rItem.innerHTML = `
+                     <div class="review-item-qnum">Question ${idx + 1}</div>
+                     <div class="review-item-question">${qSum.question}</div>
+                     <div class="review-item-details">
+                         ${answerHtml}
+                         <div class="review-item-explanation">Explanation: ${qSum.explanation}</div>
+                     </div>
+                 `;
+                 reviewContent.appendChild(rItem);
+             });
+
+             // Show/Hide Filters
+             if (incorrect > 0 || skipped > 0) {
+                 reviewFilters.style.display = 'block';
+                 // Ensure 'All' filter is active by default
+                 filterReviewItems('all');
+                 reviewFilters.querySelectorAll('button').forEach(btn => {
+                     btn.classList.toggle('active-filter', btn.dataset.filter === 'all');
+                 });
+             } else {
+                 reviewFilters.style.display = 'none';
+             }
+
+             // Typeset MathJax for the review content
+             if (typeof MathJax !== "undefined" && MathJax.typesetPromise) {
+                 setTimeout(() => { // Delay ensures DOM is ready
+                      MathJax.typesetPromise([reviewContent])
+                            .catch(err => console.error('MathJax Review typesetting error:', err));
+                 }, 50);
+             }
+        }
+
+        /**
+         * Filters the displayed review items based on status (all, incorrect, skipped).
+         * @param {'all' | 'incorrect' | 'skipped'} filter The filter criteria.
+         */
+        function filterReviewItems(filter) {
+            // TODO: Implement filter logic as described previously.
+            // Update 'active-filter' class on buttons.
+            // Show/hide '.review-item' elements based on dataset.status.
+             console.log(`Filtering review items by: ${filter}`);
+             // Update button styles
+             reviewFilters.querySelectorAll('button').forEach(btn => {
+                 btn.classList.toggle('active-filter', btn.dataset.filter === filter);
+             });
+             // Show/hide review items
+             reviewContent.querySelectorAll('.review-item').forEach(item => {
+                  const show = (filter === 'all') || item.dataset.status === filter;
+                  item.style.display = show ? 'block' : 'none'; // Toggle display
+             });
+        }
+
+        /**
+         * Handles the click on the "Back to Dashboard" button in the review view.
+         */
+        function exitReview() {
+            // TODO: Clear reviewResultsCache.
+            // Call showView() to navigate back to the appropriate dashboard (admin or user).
+             console.log("Exiting review...");
+             reviewResultsCache = null; // Clear the cached results
+             // Navigate back based on user role
+             if (isAdmin) {
+                 showView('admin-dashboard-view');
+                 // Optionally reload admin tests if needed, though usually not necessary
+                 // loadAdminTests(currentUser.uid);
+             } else {
+                 showView('user-dashboard-view');
+                 // Optionally reload public tests if needed
+                 // loadPublicTests();
+             }
+        }
+
+
+        // --- Event Listeners ---
+        console.log("Adding event listeners...");
+        // Authentication
+        loginBtn.addEventListener('click', signInWithGoogle);
+        adminLogoutBtn.addEventListener('click', signOut);
+        userLogoutBtn.addEventListener('click', signOut);
+
+        // Test Navigation
+        prevQuestionBtn.addEventListener('click', () => handleTestNavigation('prev'));
+        nextQuestionBtn.addEventListener('click', () => handleTestNavigation('next'));
+        submitTestBtn.addEventListener('click', submitTest);
+
+        // Test Actions
+        markReviewBtn.addEventListener('click', handleMarkReviewClick);
+        clearResponseBtn.addEventListener('click', handleClearResponseClick);
+        questionPalette.addEventListener('click', handlePaletteClick); // Use delegation
+
+        // Review View
+        exitReviewBtn.addEventListener('click', exitReview);
+        reviewFilters.addEventListener('click', (event) => { // Use delegation
+            const button = event.target.closest('button[data-filter]');
+            if (button) filterReviewItems(button.dataset.filter);
+        });
+
+        // Dashboard List Actions (Delegated)
+        userTestListContainer.addEventListener('click', (event) => {
+            const startButton = event.target.closest('.start-test-btn');
+            if (startButton) handleStartTestClick(event);
+        });
+        adminTestListContainer.addEventListener('click', (event) => {
+            const deleteButton = event.target.closest('.admin-delete-btn');
+            // Toggle is handled by direct listener in createAdminTestListItem
+            if (deleteButton) handleDeleteTestClick(event);
+        });
+
+        console.log("Event listeners added.");
+        // --- End of JavaScript Skeleton ---
 
     </script>
 
